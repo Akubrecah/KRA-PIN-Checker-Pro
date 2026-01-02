@@ -1,0 +1,26 @@
+{
+    "certificateDate": "26/08/2021",
+    "pin": "A016881319Q",
+    "taxpayerName": "POWEL MWENESI",
+    "emailAddress": "POWELDAYCK@GMAIL.COM",
+    "address": {
+        "building": "Lokita",
+        "street": "Lotodo",
+        "city": "Kapenguria",
+        "county": "WEST POKOT",
+        "district": "West Pokot District",
+        "taxArea": "Kapenguria",
+        "station": "KITALE",
+        "poBox": "66",
+        "postalCode": "30600"
+    },
+    "taxObligations": [
+        {
+            "srNo": 1,
+            "obligation": "Income Tax - Resident Individual",
+            "effectiveFrom": "26/08/2021",
+            "effectiveTill": "N.A.",
+            "status": "Active"
+        }
+    ]
+}

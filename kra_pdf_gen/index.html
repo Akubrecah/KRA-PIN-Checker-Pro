@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KRA PIN Certificate Generator</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="controls">
+        <div style="font-weight: bold; color: #374151;">Standalone KRA PDF Gen</div>
+        <button class="btn-download" onclick="generatePDF()">
+            <i data-lucide="download"></i>
+            Download Certificate
+        </button>
+    </div>
+
+    <!-- The Certificate -->
+    <div id="certificate-container">
+        <div id="print-area">
+            <div class="header">
+                <div class="logo-section">
+                    <img src="../image1.jpeg" alt="KRA Logo" id="kra-logo">
+                    <div class="kra-text">
+                        <!-- KENYA REVENUE<br>AUTHORITY -->
+                    </div>
+                </div>
+                <div class="cert-label">
+                    PIN Certificate
+                </div>
+                <div class="contact-info">
+                    <strong>For General Tax Questions<br>Contact KRA Call Centre</strong><br>
+                    Tel: +254 (020) 4999 999<br>
+                    Cell: +254(0711)099 999<br>
+                    Email: callcentre@kra.go.ke
+                </div>
+            </div>
+
+            <div class="date-pin-section">
+                <div class="date-pin-box">
+                    <div class="cert-date"><strong>Certificate Date :</strong> <span id="data-cert-date"></span></div>
+                    <div class="pin-label">Personal Identification Number</div>
+                    <div class="pin-value" id="data-pin"></div>
+                </div>
+            </div>
+
+            <div class="intro-text">
+                This is to certify that taxpayer shown herein has been registered with Kenya Revenue Authority
+            </div>
+
+            <div class="section-title">Taxpayer Information</div>
+            <table>
+                <tr>
+                    <td class="bg-grey">Taxpayer Name</td>
+                    <td id="data-name"></td>
+                </tr>
+                <tr>
+                    <td class="bg-grey">Email Address</td>
+                    <td id="data-email"></td>
+                </tr>
+            </table>
+
+            <div class="section-title">Registered Address</div>
+            <table>
+                <tr>
+                    <td class="bg-grey">L.R. Number :</td>
+                    <td><strong>Building :</strong> <span id="data-building"></span></td>
+                </tr>
+                <tr>
+                    <td><strong>Street/Road :</strong> <span id="data-street"></span></td>
+                    <td><strong>City/Town :</strong> <span id="data-city"></span></td>
+                </tr>
+                <tr>
+                    <td class="bg-grey">County : <span id="data-county"></span></td>
+                    <td><strong>District :</strong> <span id="data-district"></span></td>
+                </tr>
+                <tr>
+                    <td class="bg-grey">Tax Area <span id="data-tax-area"></span></td>
+                    <td><strong>Station :</strong> <span id="data-station"></span></td>
+                </tr>
+                <tr>
+                    <td class="bg-grey">P. O. Box <span id="data-box"></span></td>
+                    <td><strong>Postal Code</strong> <span id="data-postal"></span></td>
+                </tr>
+            </table>
+
+            <div class="section-title">Tax Obligation(s) Registration</div>
+            <table class="obligation-table">
+                <thead>
+                    <tr>
+                        <th>Sr. No.</th>
+                        <th>Tax Obligation(s)</th>
+                        <th>Effective From Date</th>
+                        <th>Effective Till</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="data-obligations-body">
+                    <!-- Loaded via JS -->
+                </tbody>
+            </table>
+
+            <div class="footer-text">
+                The above PIN must appear on all your tax invoices and correspondences with Kenya Revenue Authority. 
+                Your accounting end date is 31st December as per the provisions stated in the Income Tax Act unless 
+                a change has been approved by the Commissioner-Domestic Taxes Department.
+            </div>
+
+            <div class="disclaimer">
+                Disclaimer : This is a system generated certificate and does not require signature.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Init Icons
+        lucide.createIcons();
+
+        // Load JSON Data
+        async function loadData() {
+            try {
+                const response = await fetch('data.json');
+                const data = await response.json();
+                
+                // Populate Fields
+                document.getElementById('data-cert-date').textContent = data.certificateDate;
+                document.getElementById('data-pin').textContent = data.pin;
+                document.getElementById('data-name').textContent = data.taxpayerName;
+                document.getElementById('data-email').textContent = data.emailAddress;
+                
+                document.getElementById('data-building').textContent = data.address.building;
+                document.getElementById('data-street').textContent = data.address.street;
+                document.getElementById('data-city').textContent = data.address.city;
+                document.getElementById('data-county').textContent = data.address.county;
+                document.getElementById('data-district').textContent = data.address.district;
+                document.getElementById('data-tax-area').textContent = data.address.taxArea;
+                document.getElementById('data-station').textContent = data.address.station;
+                document.getElementById('data-box').textContent = data.address.poBox;
+                document.getElementById('data-postal').textContent = data.address.postalCode;
+
+                const body = document.getElementById('data-obligations-body');
+                data.taxObligations.forEach(obj => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${obj.srNo}</td>
+                        <td>${obj.obligation}</td>
+                        <td>${obj.effectiveFrom}</td>
+                        <td>${obj.effectiveTill}</td>
+                        <td>${obj.status}</td>
+                    `;
+                    body.appendChild(tr);
+                });
+            } catch (err) {
+                console.error('Error loading JSON data:', err);
+                alert('Could not load data.json. Make sure you are running a server.');
+            }
+        }
+
+        // PDF Generation
+        async function generatePDF() {
+            const element = document.getElementById('certificate-container');
+            const pin = document.getElementById('data-pin').textContent || 'CERT';
+            
+            const opt = {
+                margin: 0,
+                filename: `KRA_Certificate_${pin}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { 
+                    scale: 3, 
+                    useCORS: true,
+                    letterRendering: true
+                },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            try {
+                await html2pdf().set(opt).from(element).save();
+            } catch (error) {
+                console.error('PDF Generation Error:', error);
+            }
+        }
+
+        // Run
+        loadData();
+    </script>
+</body>
+</html>
