@@ -1,9 +1,10 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
@@ -11,14 +12,14 @@ app.use(express.static(path.join(__dirname)));
 
 const KRA_CONFIG = {
     pinByID: {
-        consumerKey: '21CPboPPSKBS3VB7ZdC2kugb8aGHCJuXcwzpTBWdQdp82oUA',
-        consumerSecret: 'pYPGt3wu6Xnx8jhA0LlYJ4gePVEqEImwr9O2XvAsTg9RObLW1bPmcbqZuPmh4Q68',
+        consumerKey: process.env.KRA_ID_CONSUMER_KEY,
+        consumerSecret: process.env.KRA_ID_CONSUMER_SECRET,
         tokenEndpoint: 'https://sbx.kra.go.ke/v1/token/generate?grant_type=client_credentials',
         pinCheckerEndpoint: 'https://sbx.kra.go.ke/checker/v1/pin'
     },
     pinByPIN: {
-        consumerKey: 'uKQlBNfocI5SplDgO5NUS8uCiTNYPA85ao9GKApMznBvIAwt',
-        consumerSecret: '2pXMstThd9OSjYTcGd0tvQPAAPIjYGKKVfMPSmlu5eLOM5IzOV7Z8dnVbgTmV5OO',
+        consumerKey: process.env.KRA_PIN_CONSUMER_KEY,
+        consumerSecret: process.env.KRA_PIN_CONSUMER_SECRET,
         tokenEndpoint: 'https://sbx.kra.go.ke/v1/token/generate?grant_type=client_credentials',
         pinCheckerEndpoint: 'https://sbx.kra.go.ke/checker/v1/pinbypin'
     }

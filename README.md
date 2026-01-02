@@ -2,7 +2,7 @@
 
 A professional, hybrid web application for KRA PIN verification and Tax Compliance Certificate generation. This project combines a lightweight Vanilla JS frontend for immediate deployment with a robust React/Vite development environment for the PDF generation engine.
 
-![PDF Certificate Preview](https://github.com/Akubrecah/KRA-PIN-Checker-Pro/assets/placeholder-image-url) 
+![PDF Certificate Preview](/assets/test.png) 
 *(Replace with actual screenshot if available)*
 
 ## 🚀 Features
