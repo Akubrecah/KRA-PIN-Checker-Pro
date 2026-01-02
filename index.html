@@ -181,6 +181,63 @@
     </style>
 </head>
 <body>
+    <!-- Navbar (Optional, simple for now) -->
+    <nav style="position: absolute; top: 0; left: 0; width: 100%; padding: 2rem; z-index: 50; display: flex; justify-content: space-between; align-items: center;">
+        <div style="font-weight: 800; font-size: 1.5rem; color: var(--primary-blue);">AkubrecaH</div>
+        <a href="https://github.com/Akubrecah/KRA-PIN-Checker-Pro" target="_blank" style="color: var(--text-dark); text-decoration: none; font-weight: 500;">GitHub</a>
+    </nav>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-content">
+                <div class="hero-badge">New: High-Res A4 Certificates</div>
+                <h1 class="hero-title">Verify KRA PINs with <br><span>Confidence & Speed</span></h1>
+                <p class="hero-subtitle">
+                    The most reliable tool to validate taxpayer details and generate official-looking Compliance Certificates instantly. Secure, private, and free.
+                </p>
+                <div style="display: flex; justify-content: center; gap: 1rem;">
+                    <button onclick="document.getElementById('tool').scrollIntoView({behavior: 'smooth'})" class="cta-button">
+                        Start Verification <i data-lucide="arrow-down"></i>
+                    </button>
+                    <!-- <button class="cta-button" style="background: white; color: var(--text-dark); box-shadow: 0 4px 12px rgba(0,0,0,0.05);">Documentation</button> -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features-section">
+            <div class="section-header">
+                <h2>Why Use This Tool?</h2>
+                <p style="color: var(--text-muted);">Built for professionals who need accuracy and speed.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper">
+                        <i data-lucide="zap" width="28"></i>
+                    </div>
+                    <h3>Instant Verification</h3>
+                    <p>Connects directly to the KRA Sandbox environment to validate PINs in milliseconds without page reloads.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper">
+                        <i data-lucide="file-check" width="28"></i>
+                    </div>
+                    <h3>A4 PDF Generation</h3>
+                    <p>Generate perfectly formatted, print-ready A4 Tax Compliance Certificates with a single click.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper">
+                        <i data-lucide="shield-check" width="28"></i>
+                    </div>
+                    <h3>Secure & Private</h3>
+                    <p>No data is stored on our servers. All processing happens locally in your browser session.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tool Section -->
+        <section id="tool">
     <div class="container">
         <header>
             <h1>PIN Checker Pro 2026</h1>
@@ -453,6 +510,23 @@
             <span class="sample-tag" onclick="fillSample('PIN', 'A521040203F')">Sample (A)</span>
         </div>
     </div>
+        </section>
+    </main>
+
+    <footer>
+        <div style="padding: 4rem 2rem; text-align: center; background: white; border-top: 1px solid #e2e8f0;">
+            <p style="color: var(--text-muted); margin-bottom: 1rem;">&copy; 2026 Akubrecah Tech Hub. All rights reserved.</p>
+            <div style="display: flex; justify-content: center; gap: 2rem;">
+                <a href="#" style="color: var(--text-muted); text-decoration: none;">Privacy</a>
+                <a href="#" style="color: var(--text-muted); text-decoration: none;">Terms</a>
+                <a href="#" style="color: var(--text-muted); text-decoration: none;">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
 
     <script src="kra_api.js"></script>
     <script>
