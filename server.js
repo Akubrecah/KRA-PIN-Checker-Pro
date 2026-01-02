@@ -1,0 +1,178 @@
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
+
+const app = express();
+const PORT = 3000;
+
+app.use(cors());
+app.use(express.json());
+app.use(express.static(path.join(__dirname)));
+
+const KRA_CONFIG = {
+    pinByID: {
+        consumerKey: '21CPboPPSKBS3VB7ZdC2kugb8aGHCJuXcwzpTBWdQdp82oUA',
+        consumerSecret: 'pYPGt3wu6Xnx8jhA0LlYJ4gePVEqEImwr9O2XvAsTg9RObLW1bPmcbqZuPmh4Q68',
+        tokenEndpoint: 'https://sbx.kra.go.ke/v1/token/generate?grant_type=client_credentials',
+        pinCheckerEndpoint: 'https://sbx.kra.go.ke/checker/v1/pin'
+    },
+    pinByPIN: {
+        consumerKey: 'uKQlBNfocI5SplDgO5NUS8uCiTNYPA85ao9GKApMznBvIAwt',
+        consumerSecret: '2pXMstThd9OSjYTcGd0tvQPAAPIjYGKKVfMPSmlu5eLOM5IzOV7Z8dnVbgTmV5OO',
+        tokenEndpoint: 'https://sbx.kra.go.ke/v1/token/generate?grant_type=client_credentials',
+        pinCheckerEndpoint: 'https://sbx.kra.go.ke/checker/v1/pinbypin'
+    }
+};
+
+let tokenCache = {
+    pinByID: { token: null, expiry: 0 },
+    pinByPIN: { token: null, expiry: 0 }
+};
+
+async function getAccessToken(apiType, retries = 2) {
+    const config = KRA_CONFIG[apiType];
+    const cache = tokenCache[apiType];
+    const now = Math.floor(Date.now() / 1000);
+
+    if (cache.token && now < cache.expiry) {
+        console.log(`[AUTH] Using cached token for ${apiType}`);
+        return cache.token;
+    }
+
+    const credentials = Buffer.from(`${config.consumerKey}:${config.consumerSecret}`).toString('base64');
+    
+    for (let i = 0; i <= retries; i++) {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 15000);
+
+        try {
+            console.log(`[AUTH] Attempt ${i + 1} for ${apiType}: Fetching token...`);
+            const response = await fetch(config.tokenEndpoint, {
+                method: 'GET',
+                headers: { 
+                    'Authorization': `Basic ${credentials}`,
+                    'User-Agent': 'Mozilla/5.0 (Node.js/KRA-Checker)',
+                    'Accept': 'application/json'
+                },
+                signal: controller.signal
+            });
+
+            clearTimeout(timeout);
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.errorMessage || 'Auth failed');
+
+            cache.token = data.access_token;
+            cache.expiry = now + parseInt(data.expires_in) - 60;
+            console.log(`[AUTH] Token retrieved successfully for ${apiType}.`);
+            return cache.token;
+        } catch (error) {
+            clearTimeout(timeout);
+            const isTimeout = error.name === 'AbortError';
+            console.error(`[AUTH] Attempt ${i + 1} for ${apiType} failed: ${isTimeout ? 'Request Timed Out' : error.message}`);
+            
+            if (i === retries) throw error;
+            await new Promise(resolve => setTimeout(resolve, i * 1000 + 500));
+        }
+    }
+}
+
+app.post('/api/check-pin', async (req, res) => {
+    try {
+        const { taxpayerType, taxpayerID } = req.body;
+        const config = KRA_CONFIG.pinByID;
+        const token = await getAccessToken('pinByID');
+
+        for (let i = 0; i <= 2; i++) {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 15000);
+
+            try {
+                console.log(`[CHECK-ID] Attempt ${i + 1}: PIN info for ${taxpayerID}`);
+                const response = await fetch(config.pinCheckerEndpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                        'User-Agent': 'Mozilla/5.0 (Node.js/KRA-Checker)',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        TaxpayerType: taxpayerType,
+                        TaxpayerID: taxpayerID
+                    }),
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeout);
+                const data = await response.json();
+                if (!response.ok) {
+                    console.log(`[CHECK-ID] KRA returned error: ${JSON.stringify(data)}`);
+                    return res.status(response.status).json(data);
+                }
+                console.log('[CHECK-ID] PIN info retrieved successfully.');
+                return res.json(data);
+            } catch (error) {
+                clearTimeout(timeout);
+                const isTimeout = error.name === 'AbortError';
+                console.error(`[CHECK-ID] Attempt ${i + 1} failed: ${isTimeout ? 'Request Timed Out' : error.message}`);
+                if (i === 2) throw error;
+                await new Promise(resolve => setTimeout(resolve, i * 1000 + 500));
+            }
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ errorMessage: error.message });
+    }
+});
+
+app.post('/api/check-pin-by-pin', async (req, res) => {
+    try {
+        const { kraPIN } = req.body;
+        const config = KRA_CONFIG.pinByPIN;
+        const token = await getAccessToken('pinByPIN');
+
+        for (let i = 0; i <= 2; i++) {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 15000);
+
+            try {
+                console.log(`[CHECK-PIN] Attempt ${i + 1}: Data for ${kraPIN}`);
+                const response = await fetch(config.pinCheckerEndpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                        'User-Agent': 'Mozilla/5.0 (Node.js/KRA-Checker)',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        KRAPIN: kraPIN
+                    }),
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeout);
+                const data = await response.json();
+                if (!response.ok) {
+                    console.log(`[CHECK-PIN] KRA returned error: ${JSON.stringify(data)}`);
+                    return res.status(response.status).json(data);
+                }
+                console.log('[CHECK-PIN] PIN info retrieved successfully.');
+                return res.json(data);
+            } catch (error) {
+                clearTimeout(timeout);
+                const isTimeout = error.name === 'AbortError';
+                console.error(`[CHECK-PIN] Attempt ${i + 1} failed: ${isTimeout ? 'Request Timed Out' : error.message}`);
+                if (i === 2) throw error;
+                await new Promise(resolve => setTimeout(resolve, i * 1000 + 500));
+            }
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ errorMessage: error.message });
+    }
+});
+
+app.listen(PORT, () => {
+    console.log(`KRA Multi-API Proxy Server running at http://localhost:${PORT}`);
+});
