@@ -67,8 +67,25 @@ This repository uses a flat hybrid structure:
 
 ## ⚙️ Configuration
 
-- **API Endpoints**: The application simulates API calls in `kra_api.js`. You can replace `fetchMockData` with real backend endpoints in a production environment.
+- **API Endpoints**: The application uses a local proxy server (`server.js`) to handle CORS and authentication with the KRA sandbox.
+- **Environment Variables**: You must create a `.env` file in the root directory with your KRA credentials:
+  ```env
+  KRA_ID_CONSUMER_KEY=your_key_here
+  KRA_ID_CONSUMER_SECRET=your_secret_here
+  KRA_PIN_CONSUMER_KEY=your_key_here
+  KRA_PIN_CONSUMER_SECRET=your_secret_here
+  PORT=3000
+  ```
 - **PDF Settings**: Layout constraints are defined in `style.css` under `#certificate-container`.
+
+### Running the Proxy Server
+To use the live API verification:
+1. Ensure `.env` is configured.
+2. Run the server:
+   ```bash
+   node server.js
+   ```
+3. The frontend (`index.html`) is configured to talk to `http://localhost:3000`.
 
 ## 🤝 Contributing
 
