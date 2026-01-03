@@ -1,103 +1,70 @@
-# KRA PIN Checker Pro
+# KRA PIN Checker Pro - Playful Brutalism Pivot
 
-A professional, hybrid web application for KRA PIN verification and Tax Compliance Certificate generation. This project combines a lightweight Vanilla JS frontend for immediate deployment with a robust React/Vite development environment for the PDF generation engine.
+A high-end, developer-first tool for KRA PIN verification and Tax Compliance Certificate generation, now featuring a **"Playful Brutalism"** design system.
 
 <div align="center">
 
-![PDF Certificate Preview](/assets/test.png)
+![Bento Grid Preview](./bento_grid_preview.png)
+*(Note: Replace with actual screenshot path)*
 
 </div>
-<!-- *(Replace with actual screenshot if available)* -->
 
-## 🚀 Features
+## 🎨 Design Philosophy: Playful Brutalism
+This project successfully pivoted to a bold new aesthetic:
+-   **Palette**: Vibrant Coral Orange (`#F66C40`) & Soft Periwinkle Blue (`#8EAEED`).
+-   **Typography**: Massive, geometric `Inter` headings against clean sans-serif body text.
+-   **Layout**: Asymmetrical **Bento Grids**, rounded "Squipple" corners, and organic shapes.
+-   **Interaction**: Premium "Webflow-style" animations (Marquee, hover scales, smooth scrolls).
 
-### Core Functionality
-- **PIN Verification**: Instantly validate KRA PINs and retrieve associated taxpayer details (Name, Address, Station).
-- **Certificate Generation**: Create official-looking, A4-sized KRA PIN Certificates.
-- **Standalone PDF Engine**: Uses `html2pdf.js` for reliable, client-side PDF generation without server overhead.
-- **Responsive Design**: Modern, mobile-responsive UI with a clean aesthetic.
+## 🚀 Key Features
 
-### Technical Highlights
-- **Hybrid Architecture**: 
-  - **Production**: Vanilla HTML/JS/CSS (`index.html`) for zero-build deployment.
-  - **Development**: React + Vite (`src/`) for component-based development of complex UI parts.
-- **Dynamic Preview**: Real-time certificate preview updates as you type.
-- **Smart Layout**: Enforced A4 dimensions ensuring perfect single-page printing.
+### 1. Instant Verification Scanner
+-   Direct integration with KRA Sandbox API.
+-   Validates PINs (e.g., `P000000000X`) in milliseconds.
+-   Retrieves Taxpayer Name, Station, and Obligation details.
+
+### 2. High-Fidelity PDF Generation
+-   Generates print-ready **A4 Tax Compliance Certificates**.
+-   Client-side rendering using `html2pdf.js` (Zero server overhead).
+-   Perfect alignment with Official KRA 2026 templates.
+
+### 3. Monetization & Access Control
+-   **Authentication**: Multi-role support (Personal vs. Cyber/Business).
+-   **Pay-Per-Use**: Micro-transaction simulation for Personal users (100 KES/check).
+-   **Subscriptions**: Weekly/Monthly plans for high-volume Cyber users.
+-   **Feature Gating**: Smart locking of scanner features based on user credits.
 
 ## 📂 Project Structure
 
-This repository uses a flat hybrid structure:
-
-| File/Folder | Description |
+| File | Description |
 |---|---|
-| **`index.html`** | **The Main App**. Open this to run the PIN Checker immediately. No build steps. |
-| **`style.css`** | Styles for the main application. |
+| **`index.html`** | The core application. Contains the new Hero, Bento Grid, and Scanner tool. |
+| **`style.css`** | The **Design System**. Defines the Playful Brutalism variables, grids, and animations. |
+| **`auth.js`** | Handles User Roles, Mock Payments, and Feature Gating logic. |
 | **`kra_api.js`** | Logic for mocking/fetching KRA API data. |
-| `src/` | React source code for the PDF generator component (Development). |
-| `index.react.html` | Entry point for the React development server. |
-| `vite.config.ts` | Configuration for the Vite build tool. |
 
-## 🛠️ Getting Started
+## 🛠️ Usage
 
-### Method 1: Quick Start (Vanilla JS)
-**Use this for the main application.**
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/Akubrecah/KRA-PIN-Checker-Pro.git
-   ```
-2. Navigate to the folder:
-   ```bash
-   cd KRA-PIN-Checker-Pro
-   ```
-3. Open `index.html` in your browser.
-   - on Linux/Mac: `open index.html`
-   - on Windows: `start index.html`
+1.  **Clone & Run**:
+    ```bash
+    git clone https://github.com/Akubrecah/KRA-PIN-Checker-Pro.git
+    cd KRA-PIN-Checker-Pro
+    # No build required. Just open index.html
+    open index.html
+    ```
 
-### Method 2: Developer Mode (React/Vite)
-**Use this if you want to modify the PDF generator logic.**
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-2. Start the development server:
-   ```bash
-   npm run dev
-   ```
-3. Open the link provided in the terminal (usually `http://localhost:5173`).
+2.  **Authentication Flow**:
+    -   Click **"Login"**.
+    -   Select **"Register"** -> **"Personal User"**.
+    -   Key in any dummy email/password.
+    -   Attempt a scan -> **Pay 100 KES** (Simulation) -> **Success**.
 
-## ⚙️ Configuration
-
-- **API Endpoints**: The application uses a local proxy server (`server.js`) to handle CORS and authentication with the KRA sandbox.
-- **Environment Variables**: You must create a `.env` file in the root directory with your KRA credentials:
-  ```env
-  KRA_ID_CONSUMER_KEY=your_key_here
-  KRA_ID_CONSUMER_SECRET=your_secret_here
-  KRA_PIN_CONSUMER_KEY=your_key_here
-  KRA_PIN_CONSUMER_SECRET=your_secret_here
-  PORT=3000
-  ```
-- **PDF Settings**: Layout constraints are defined in `style.css` under `#certificate-container`.
-
-### Running the Proxy Server
-To use the live API verification:
-1. Ensure `.env` is configured.
-2. Run the server:
-   ```bash
-   node server.js
-   ```
-3. The frontend (`index.html`) is configured to talk to `http://localhost:3000`.
-
-## 🤝 Contributing
-
-1. Fork the repository.
-2. Create settings feature branch (`git checkout -b feature/AmazingFeature`).
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`).
-4. Push to the branch (`git push origin feature/AmazingFeature`).
-5. Open a Pull Request.
-
-## 📄 License
-
-Distributed under the MIT License. See `LICENSE` for more information.
+## ⚙️ Configuration (Optional)
+Create a `.env` file for backend proxy usage (if running `server.js`):
+```env
+KRA_PIN_CONSUMER_KEY=your_key
+KRA_PIN_CONSUMER_SECRET=your_secret
+```
 
 ## ⚠️ Disclaimer
-This tool is for educational and testing purposes only. It is not affiliated with the Kenya Revenue Authority. Generated certificates are **molds/previews** and not legal documents.
+This tool is for educational purposes. Generated certificates are previews, not legal documents.
