@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing | AkubrecaH Technologies</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <header class="site-header">
+        <nav class="nav-glass">
+            <div class="logo"><a href="index.html">AkubrecaH</a></div>
+            <div class="nav-links">
+                <a href="index.html#tool" class="nav-link">Scanner</a>
+                <a href="pricing.html" class="nav-link active">Pricing</a>
+                <a href="about.html" class="nav-link">About</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+            </div>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <button class="btn-primary" onclick="window.location.href='index.html#tool'">Get Started</button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero-section" style="min-height: 50vh; padding-top: 6rem; text-align: center; display: block;">
+            <div class="container">
+                <h1 style="font-size: 4rem; margin-bottom: 2rem;">Simple, Transparent <br><span class="text-gradient">Pricing.</span></h1>
+                <p style="font-size: 1.25rem; color: #52525B; max-width: 600px; margin: 0 auto;">
+                    Choose the plan that fits your needs. Whether you're an individual or a business, we have you covered.
+                </p>
+            </div>
+        </section>
+
+        <section class="bento-section">
+            <div class="bento-grid" style="grid-template-rows: auto;">
+                <!-- Personal Plan -->
+                <div class="bento-card" style="background: white; border: 2px solid var(--color-text); text-align: center; justify-content: flex-start;">
+                    <div class="bento-icon" style="margin: 0 auto 1.5rem;"><i data-lucide="user"></i></div>
+                    <h3 style="color: var(--color-text); font-size: 1.75rem;">Personal</h3>
+                    <div style="font-size: 3rem; font-weight: 900; color: var(--color-primary); margin: 1.5rem 0;">100 KES<span style="font-size: 1.2rem; color: #71717A; font-weight: 500;">/use</span></div>
+                    <ul style="list-style: none; text-align: left; margin-bottom: 2.5rem; color: var(--color-text); display: flex; flex-direction: column; gap: 0.75rem;">
+                        <li style="display: flex; gap: 10px; align-items: center;"><i data-lucide="check-circle" style="width: 18px; color: var(--color-primary);"></i> Single PIN Check</li>
+                        <li style="display: flex; gap: 10px; align-items: center;"><i data-lucide="check-circle" style="width: 18px; color: var(--color-primary);"></i> 1 PDF Certificate</li>
+                        <li style="display: flex; gap: 10px; align-items: center;"><i data-lucide="check-circle" style="width: 18px; color: var(--color-primary);"></i> Instant Download</li>
+                        <li style="display: flex; gap: 10px; align-items: center;"><i data-lucide="check-circle" style="width: 18px; color: var(--color-primary);"></i> No Commitment</li>
+                    </ul>
+                    <button class="btn-primary" style="width: 100%;" onclick="window.location.href='index.html#authModal'">Get Started</button>
+                </div>
+                
+                <!-- Cyber/Business Plan -->
+                <div class="bento-card bento-large" style="background: var(--color-secondary); color: white; justify-content: flex-start;">
+                    <div style="position: absolute; top: 20px; right: 20px; background: white; color: var(--color-primary); padding: 6px 16px; border-radius: 99px; font-size: 0.9rem; font-weight: 800;">Most Popular</div>
+                    <div class="bento-icon" style="color: var(--color-secondary); margin-bottom: 1.5rem;"><i data-lucide="briefcase"></i></div>
+                    <h3 style="font-size: 2.25rem;">Cyber Premium</h3>
+                    <div style="font-size: 4rem; font-weight: 900; margin: 1rem 0;">2,500 KES<span style="font-size: 1.5rem; opacity: 0.8; font-weight: 500;">/mo</span></div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                        <ul style="list-style: none; text-align: left; display: flex; flex-direction: column; gap: 0.75rem;">
+                            <li style="display: flex; gap: 10px; align-items: center;"><i data-lucide="check" style="width: 20px;"></i> Unlimited Scans</li>
+                            <li style="display: flex; gap: 10px; align-items: center;"><i data-lucide="check" style="width: 20px;"></i> Unlimited PDFs</li>
+                        </ul>
+                        <ul style="list-style: none; text-align: left; display: flex; flex-direction: column; gap: 0.75rem;">
+                            <li style="display: flex; gap: 10px; align-items: center;"><i data-lucide="check" style="width: 20px;"></i> Priority Support</li>
+                            <li style="display: flex; gap: 10px; align-items: center;"><i data-lucide="check" style="width: 20px;"></i> Batch processing</li>
+                        </ul>
+                    </div>
+                    <button class="btn-primary" style="width: 100%; background: white; color: var(--color-text);" onclick="window.location.href='index.html#authModal'">Subscribe Now</button>
+                </div>
+
+                <!-- API Plan -->
+                <div class="bento-card" style="background: var(--color-text); color: white; justify-content: flex-start;">
+                    <div class="bento-icon" style="background: rgba(255,255,255,0.1); color: white; margin-bottom: 1.5rem;"><i data-lucide="code"></i></div>
+                    <h3 style="font-size: 1.75rem;">Developer API</h3>
+                    <div style="font-size: 3rem; font-weight: 900; color: white; margin: 1.5rem 0;">Custom</div>
+                    <ul style="list-style: none; text-align: left; margin-bottom: 2.5rem; display: flex; flex-direction: column; gap: 0.75rem; opacity: 0.8;">
+                        <li style="display: flex; gap: 10px; align-items: center;"><i data-lucide="check" style="width: 18px;"></i> Full API Access</li>
+                        <li style="display: flex; gap: 10px; align-items: center;"><i data-lucide="check" style="width: 18px;"></i> High Rate Limits</li>
+                        <li style="display: flex; gap: 10px; align-items: center;"><i data-lucide="check" style="width: 18px;"></i> Dedicated Support</li>
+                        <li style="display: flex; gap: 10px; align-items: center;"><i data-lucide="check" style="width: 18px;"></i> SLA Guarantees</li>
+                    </ul>
+                    <button class="btn-primary" style="width: 100%; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);" onclick="window.location.href='contact.html'">Contact Sales</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="fat-footer">
+        <div class="footer-content">
+            <div class="footer-cta">
+                <h2>Ready to <br>Get Started?</h2>
+                <a href="index.html#tool" class="footer-btn">Launch Scanner</a>
+            </div>
+            <div class="footer-links">
+                <div style="display: flex; flex-direction: column; gap: 1rem; text-align: left;">
+                    <strong>Product</strong>
+                    <a href="pricing.html" class="footer-link">Pricing</a>
+                    <a href="api-docs.html" class="footer-link">API</a>
+                    <a href="api-docs.html" class="footer-link">Documentation</a>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 1rem; text-align: left;">
+                    <strong>Company</strong>
+                    <a href="about.html" class="footer-link">About</a>
+                    <a href="#" class="footer-link">Blog</a>
+                    <a href="contact.html" class="footer-link">Contact</a>
+                </div>
+            </div>
+        </div>
+        <div class="copyright">
+            &copy; 2026 Akubrecah Technologies. Playful Brutalism Edition.
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
