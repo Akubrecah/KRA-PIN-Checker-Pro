@@ -269,29 +269,68 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client.js"></script>
     <script>
         lucide.createIcons();
         
-        // Check if already logged in
-        const user = JSON.parse(localStorage.getItem('currentUser'));
-        if (user && user.onboarded) {
-            window.location.href = 'dashboard.html';
+        // Wait for Supabase to init
+        const checkInit = setInterval(async () => {
+            if (window.SupabaseClient && window.supabase) {
+                clearInterval(checkInit);
+                checkLoginState();
+            }
+        }, 100);
+        
+        async function checkLoginState() {
+            const session = await window.SupabaseClient.auth.getSession();
+            if (session) {
+                // If user has session, check if profile exists/fetch role
+                try {
+                    const profile = await window.SupabaseClient.profile.get(session.user.id);
+                    const user = {
+                        ...session.user,
+                        role: profile ? profile.role : 'personal',
+                        loggedIn: true
+                    };
+                    localStorage.setItem('currentUser', JSON.stringify(user)); // Keep local sync for now
+                    window.location.href = 'dashboard.html';
+                } catch (e) {
+                    console.error('Profile fetch failed', e);
+                }
+            }
         }
         
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            const btn = this.querySelector('button[type="submit"]');
+            const originalText = btn.textContent;
             
-            // Simulate login (replace with real Supabase auth)
-            const userData = {
-                email: email,
-                role: 'personal',
-                loggedIn: true,
-                onboarded: true // Assuming returning users are onboarded
-            };
-            localStorage.setItem('currentUser', JSON.stringify(userData));
-            window.location.href = 'dashboard.html';
+            try {
+                btn.disabled = true;
+                btn.textContent = 'Logging in...';
+                
+                const { user, session } = await window.SupabaseClient.auth.signIn(email, password);
+                
+                if (user) {
+                     // Fetch profile to get role
+                     const profile = await window.SupabaseClient.profile.get(user.id);
+                     const userData = {
+                         ...user,
+                         role: profile ? profile.role : 'personal',
+                         loggedIn: true
+                     };
+                     localStorage.setItem('currentUser', JSON.stringify(userData));
+                     window.location.href = 'dashboard.html';
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                alert('Login Failed: ' + error.message);
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
         });
     </script>
 </body>

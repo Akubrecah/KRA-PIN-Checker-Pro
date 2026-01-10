@@ -581,24 +581,48 @@
         </section>
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client.js"></script>
     <script src="kra_api.js"></script>
     <script>
         lucide.createIcons();
         
-        // Check authentication
-        const user = JSON.parse(localStorage.getItem('currentUser'));
-        if (!user || !user.loggedIn) {
-            window.location.href = 'login.html';
-        } else if (!user.onboarded) {
-            window.location.href = 'onboarding.html';
+        let currentUser = null;
+
+        // Initialize and Check Auth
+        async function initDashboard() {
+            // Wait for Supabase
+            if (!window.SupabaseClient || !window.supabase) {
+                setTimeout(initDashboard, 100);
+                return;
+            }
+
+            try {
+                const session = await window.SupabaseClient.auth.getSession();
+                if (!session) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                // Get full profile
+                const profile = await window.SupabaseClient.profile.get(session.user.id);
+                currentUser = { ...session.user, ...profile };
+                
+                // Update UI
+                const name = currentUser.full_name || currentUser.email.split('@')[0];
+                document.getElementById('userName').textContent = name;
+                document.getElementById('userAvatar').textContent = name.charAt(0).toUpperCase();
+
+                // Refresh credits
+                document.getElementById('creditsLeft').textContent = currentUser.credits || 0;
+                
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                window.location.href = 'login.html';
+            }
         }
-        
-        // Update UI with user info
-        if (user) {
-            const name = user.name || user.email.split('@')[0];
-            document.getElementById('userName').textContent = name;
-            document.getElementById('userAvatar').textContent = name.charAt(0).toUpperCase();
-        }
+
+        initDashboard();
         
         // Load stats from localStorage
         const stats = JSON.parse(localStorage.getItem('userStats')) || { verifications: 0, certificates: 0, credits: 5 };
@@ -731,13 +755,16 @@
                     .kra-cert-container {
                         width: 210mm;
                         height: 297mm;
+                        max-height: 297mm;
                         background: white;
-                        padding: 2.5cm;
+                        padding: 2.0cm; /* Reduced from 2.5cm to ensure single page fit */
                         box-sizing: border-box;
                         font-family: 'Inter', system-ui, -apple-system, sans-serif;
                         color: black;
                         display: flex;
                         flex-direction: column;
+                        position: relative;
+                        overflow: hidden; /* Strict overflow hiding */
                     }
                     
                     .kra-cert-header {
@@ -745,8 +772,8 @@
                         justify-content: space-between;
                         align-items: flex-start;
                         border-bottom: 2px solid black;
-                        padding-bottom: 15px;
-                        margin-bottom: 20px;
+                        padding-bottom: 10px; /* Reduced padding */
+                        margin-bottom: 15px; /* Reduced margin */
                     }
                     
                     .kra-logo-section {
@@ -851,15 +878,15 @@
                     
                     .kra-footer-text {
                         font-size: 10px;
-                        line-height: 1.5;
+                        line-height: 1.4;
                         margin-top: auto;
-                        padding-top: 20px;
+                        padding-top: 15px;
                     }
                     
                     .kra-disclaimer {
                         border-top: 1px solid black;
                         padding-top: 5px;
-                        margin-top: 30px;
+                        margin-top: 15px; /* Reduced margin */
                         font-weight: 700;
                         font-size: 10px;
                     }
@@ -981,13 +1008,16 @@
                 filename: filename,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { 
-                    scale: 3, 
+                    scale: 2, 
                     useCORS: true, 
                     letterRendering: true,
                     scrollY: 0,
-                    logging: false
+                    logging: false,
+                    windowWidth: 794, // A4 pixel width at 96 DPI
+                    windowHeight: 1123
                 },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
             };
             
             html2pdf().set(opt).from(certElement).save().then(() => {
@@ -1000,10 +1030,11 @@
             showStatus('Official KRA Certificate generated and downloaded!');
         }
         
-        function toggleUserMenu() {
+        async function toggleUserMenu() {
             if (confirm('Logout?')) {
-                localStorage.removeItem('currentUser');
-                window.location.href = 'index.html';
+                await window.SupabaseClient.auth.signOut();
+                localStorage.removeItem('currentUser'); // optional cleaning
+                window.location.href = 'login.html';
             }
         }
         
