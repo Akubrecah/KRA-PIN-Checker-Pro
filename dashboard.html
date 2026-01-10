@@ -131,7 +131,7 @@
         
         .content-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1.2fr 0.8fr;
             gap: 2rem;
         }
         
@@ -143,7 +143,7 @@
         }
         
         .card-header {
-            padding: 1.5rem 2rem;
+            padding: 1.25rem 1.5rem;
             border-bottom: 1px solid var(--color-border);
             display: flex;
             justify-content: space-between;
@@ -151,43 +151,105 @@
         }
         
         .card-header h2 {
-            font-size: 1.25rem;
+            font-size: 1.15rem;
             color: var(--color-text-dark);
             margin: 0;
         }
         
         .card-body {
-            padding: 2rem;
+            padding: 1.5rem;
+        }
+
+        /* Verification Section */
+        .verify-section {
+            background: linear-gradient(135deg, #f8f4ff 0%, #ede7f6 100%);
+            border: 1px solid #e0d4f7;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .verify-row {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+        
+        .verify-group {
+            flex: 1;
+        }
+        
+        .verify-group label {
+            display: block;
+            font-weight: 600;
+            color: var(--color-text-dark);
+            font-size: 0.8rem;
+            margin-bottom: 0.4rem;
+        }
+        
+        .verify-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-family: inherit;
+        }
+        
+        .btn-verify {
+            background: linear-gradient(135deg, #5FCDB8 0%, #4DB8A5 100%);
+            color: #1F1B3D;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        
+        .btn-verify:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(95, 205, 184, 0.3);
         }
         
         .form-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 1rem;
         }
         
         .form-group {
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 0.4rem;
         }
         
         .form-group.full-width {
+            grid-column: span 3;
+        }
+        
+        .form-group.half-width {
             grid-column: span 2;
         }
         
         .form-group label {
             font-weight: 600;
             color: var(--color-text-dark);
-            font-size: 0.85rem;
+            font-size: 0.8rem;
         }
         
         .form-group input,
         .form-group select {
-            padding: 10px 14px;
+            padding: 8px 12px;
             border: 1px solid var(--color-border);
             border-radius: 8px;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-family: inherit;
             transition: all 0.2s;
         }
@@ -199,6 +261,15 @@
             box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
         }
         
+        .form-section-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin: 1.25rem 0 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--color-border);
+        }
+        
         .form-actions {
             display: flex;
             gap: 1rem;
@@ -207,31 +278,10 @@
             border-top: 1px solid var(--color-border);
         }
         
-        .btn-verify {
-            background: linear-gradient(135deg, #5FCDB8 0%, #4DB8A5 100%);
-            color: #1F1B3D;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-family: inherit;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-        }
-        
-        .btn-verify:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(95, 205, 184, 0.3);
-        }
-        
         .btn-generate {
             background: var(--gradient-primary);
             color: white;
-            padding: 12px 20px;
+            padding: 12px 24px;
             border: none;
             border-radius: 8px;
             font-weight: 600;
@@ -253,53 +303,48 @@
             background: #ECFDF5;
             border: 1px solid #10B981;
             border-radius: 8px;
-            padding: 0.75rem 1rem;
+            padding: 0.6rem 1rem;
             margin-bottom: 1rem;
             display: none;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             color: #065F46;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
         
-        .verification-status.show {
-            display: flex;
-        }
-        
-        .verification-status.error {
-            background: #FEF2F2;
-            border-color: #EF4444;
-            color: #991B1B;
-        }
+        .verification-status.show { display: flex; }
+        .verification-status.error { background: #FEF2F2; border-color: #EF4444; color: #991B1B; }
         
         /* Certificate Preview */
         .cert-preview {
             background: #fff;
             border: 2px solid #7C3AED;
             border-radius: 12px;
-            padding: 2rem;
+            padding: 1.5rem;
             height: 100%;
             display: flex;
             flex-direction: column;
+            max-height: calc(100vh - 300px);
+            overflow-y: auto;
         }
         
-        .cert-header {
+        .cert-header-preview {
             text-align: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
             border-bottom: 2px solid #eee;
         }
         
-        .cert-header h3 {
+        .cert-header-preview h3 {
             color: #7C3AED;
             margin: 0 0 0.25rem 0;
-            font-size: 1.25rem;
+            font-size: 1.1rem;
         }
         
-        .cert-header p {
+        .cert-header-preview p {
             color: #666;
             margin: 0;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
         }
         
         .cert-body {
@@ -309,52 +354,31 @@
         .cert-row {
             display: flex;
             border-bottom: 1px solid #eee;
-            padding: 0.75rem 0;
+            padding: 0.5rem 0;
+            font-size: 0.8rem;
         }
         
-        .cert-row:last-child {
-            border-bottom: none;
-        }
-        
-        .cert-label {
-            font-weight: 600;
-            color: #333;
-            width: 40%;
-            font-size: 0.9rem;
-        }
-        
-        .cert-value {
-            color: #666;
-            font-size: 0.9rem;
-        }
-        
-        .cert-value.active {
-            color: #10B981;
-            font-weight: 600;
-        }
-        
-        .cert-value.inactive {
-            color: #EF4444;
-            font-weight: 600;
-        }
+        .cert-row:last-child { border-bottom: none; }
+        .cert-label { font-weight: 600; color: #333; width: 40%; }
+        .cert-value { color: #666; }
+        .cert-value.active { color: #10B981; font-weight: 600; }
+        .cert-value.inactive { color: #EF4444; font-weight: 600; }
         
         .cert-footer {
             text-align: center;
-            margin-top: 1.5rem;
-            padding-top: 1rem;
+            margin-top: 1rem;
+            padding-top: 0.75rem;
             border-top: 2px solid #eee;
             color: #999;
-            font-size: 0.75rem;
+            font-size: 0.65rem;
         }
         
-        @media (max-width: 1024px) {
-            .content-grid { grid-template-columns: 1fr; }
-        }
-        
+        @media (max-width: 1200px) { .content-grid { grid-template-columns: 1fr; } }
         @media (max-width: 768px) {
             .form-grid { grid-template-columns: 1fr; }
-            .form-group.full-width { grid-column: span 1; }
+            .form-group.full-width, .form-group.half-width { grid-column: span 1; }
             .dashboard-nav { display: none; }
+            .verify-row { flex-direction: column; align-items: stretch; }
         }
     </style>
 </head>
@@ -400,30 +424,96 @@
             <!-- Form Card -->
             <div class="main-card">
                 <div class="card-header">
-                    <h2>Certificate Generator</h2>
+                    <h2>Certificate Details</h2>
                 </div>
                 <div class="card-body">
                     <div class="verification-status" id="verificationStatus">
-                        <i data-lucide="check-circle" style="width: 18px;"></i>
+                        <i data-lucide="check-circle" style="width: 16px;"></i>
                         <span id="statusMessage">PIN verified successfully!</span>
                     </div>
                     
+                    <!-- Verification Section -->
+                    <div class="verify-section">
+                        <div class="verify-row">
+                            <div class="verify-group">
+                                <label>KRA PIN</label>
+                                <input type="text" id="kraPin" placeholder="e.g., A012345678Z" maxlength="11">
+                            </div>
+                            <div class="verify-group">
+                                <label>ID Number</label>
+                                <input type="text" id="idNumber" placeholder="e.g., 12345678">
+                            </div>
+                            <button class="btn-verify" onclick="verifyAndAutofill()">
+                                <i data-lucide="search" style="width: 14px;"></i>
+                                Verify & Autofill
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Personal Details -->
+                    <div class="form-section-title">Personal Details</div>
                     <div class="form-grid">
-                        <div class="form-group">
-                            <label>KRA PIN</label>
-                            <input type="text" id="kraPin" placeholder="e.g., A012345678Z" maxlength="11" oninput="updatePreview()">
-                        </div>
-                        <div class="form-group">
-                            <label>ID Number</label>
-                            <input type="text" id="idNumber" placeholder="e.g., 12345678">
-                        </div>
-                        <div class="form-group full-width">
+                        <div class="form-group half-width">
                             <label>Taxpayer Name *</label>
                             <input type="text" id="taxpayerName" placeholder="Full name as per KRA" oninput="updatePreview()">
                         </div>
                         <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" id="inEmail" placeholder="email@example.com" oninput="updatePreview()">
+                        </div>
+                    </div>
+                    
+                    <!-- Address Details -->
+                    <div class="form-section-title">Address Details</div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Building</label>
+                            <input type="text" id="inBuilding" placeholder="Building name" oninput="updatePreview()">
+                        </div>
+                        <div class="form-group">
+                            <label>Street/Road</label>
+                            <input type="text" id="inStreet" placeholder="Street name" oninput="updatePreview()">
+                        </div>
+                        <div class="form-group">
+                            <label>City/Town</label>
+                            <input type="text" id="inCity" placeholder="City" oninput="updatePreview()">
+                        </div>
+                        <div class="form-group">
+                            <label>County</label>
+                            <input type="text" id="inCounty" placeholder="County" oninput="updatePreview()">
+                        </div>
+                        <div class="form-group">
+                            <label>District</label>
+                            <input type="text" id="inDistrict" placeholder="District" oninput="updatePreview()">
+                        </div>
+                        <div class="form-group">
+                            <label>L.R. Number</label>
+                            <input type="text" id="inLRNumber" placeholder="Land Reference" oninput="updatePreview()">
+                        </div>
+                        <div class="form-group">
+                            <label>P.O. Box</label>
+                            <input type="text" id="inBox" placeholder="P.O. Box" oninput="updatePreview()">
+                        </div>
+                        <div class="form-group">
+                            <label>Postal Code</label>
+                            <input type="text" id="inPostal" placeholder="Postal Code" oninput="updatePreview()">
+                        </div>
+                        <div class="form-group">
+                            <label>Tax Area</label>
+                            <input type="text" id="inTaxArea" placeholder="Tax Area" oninput="updatePreview()">
+                        </div>
+                    </div>
+                    
+                    <!-- Tax Details -->
+                    <div class="form-section-title">Tax Details</div>
+                    <div class="form-grid">
+                        <div class="form-group">
                             <label>Tax Obligation</label>
-                            <input type="text" id="taxObligation" placeholder="e.g., Income Tax - Resident Individual" oninput="updatePreview()">
+                            <input type="text" id="taxObligation" placeholder="e.g., Income Tax" oninput="updatePreview()">
+                        </div>
+                        <div class="form-group">
+                            <label>Station</label>
+                            <input type="text" id="inStation" placeholder="KRA Station" oninput="updatePreview()">
                         </div>
                         <div class="form-group">
                             <label>Status</label>
@@ -435,7 +525,11 @@
                         </div>
                         <div class="form-group">
                             <label>Effective From</label>
-                            <input type="date" id="effectiveFrom" oninput="updatePreview()">
+                            <input type="text" id="effectiveFrom" placeholder="DD/MM/YYYY" oninput="updatePreview()">
+                        </div>
+                        <div class="form-group">
+                            <label>Effective Till</label>
+                            <input type="text" id="effectiveTill" placeholder="N.A." value="N.A." oninput="updatePreview()">
                         </div>
                         <div class="form-group">
                             <label>Principal Activity</label>
@@ -444,13 +538,9 @@
                     </div>
 
                     <div class="form-actions">
-                        <button class="btn-verify" onclick="verifyAndAutofill()">
-                            <i data-lucide="search" style="width: 16px;"></i>
-                            Verify & Autofill
-                        </button>
                         <button class="btn-generate" onclick="generateCertificate()">
                             <i data-lucide="download" style="width: 16px;"></i>
-                            Generate PDF
+                            Generate PDF Certificate
                         </button>
                     </div>
                 </div>
@@ -463,35 +553,23 @@
                 </div>
                 <div class="card-body">
                     <div class="cert-preview" id="certPreview">
-                        <div class="cert-header">
+                        <div class="cert-header-preview">
                             <h3>KRA PIN Verification Certificate</h3>
                             <p>Generated by AkubrecaH Technologies</p>
                         </div>
                         <div class="cert-body">
-                            <div class="cert-row">
-                                <div class="cert-label">KRA PIN</div>
-                                <div class="cert-value" id="previewPin">-</div>
-                            </div>
-                            <div class="cert-row">
-                                <div class="cert-label">Taxpayer Name</div>
-                                <div class="cert-value" id="previewName">-</div>
-                            </div>
-                            <div class="cert-row">
-                                <div class="cert-label">Tax Obligation</div>
-                                <div class="cert-value" id="previewObligation">-</div>
-                            </div>
-                            <div class="cert-row">
-                                <div class="cert-label">PIN Status</div>
-                                <div class="cert-value" id="previewStatus">-</div>
-                            </div>
-                            <div class="cert-row">
-                                <div class="cert-label">Effective From</div>
-                                <div class="cert-value" id="previewDate">-</div>
-                            </div>
-                            <div class="cert-row">
-                                <div class="cert-label">Principal Activity</div>
-                                <div class="cert-value" id="previewActivity">-</div>
-                            </div>
+                            <div class="cert-row"><div class="cert-label">KRA PIN</div><div class="cert-value" id="previewPin">-</div></div>
+                            <div class="cert-row"><div class="cert-label">Taxpayer Name</div><div class="cert-value" id="previewName">-</div></div>
+                            <div class="cert-row"><div class="cert-label">Email</div><div class="cert-value" id="previewEmail">-</div></div>
+                            <div class="cert-row"><div class="cert-label">Address</div><div class="cert-value" id="previewAddress">-</div></div>
+                            <div class="cert-row"><div class="cert-label">City/Town</div><div class="cert-value" id="previewCity">-</div></div>
+                            <div class="cert-row"><div class="cert-label">County</div><div class="cert-value" id="previewCounty">-</div></div>
+                            <div class="cert-row"><div class="cert-label">P.O. Box</div><div class="cert-value" id="previewBox">-</div></div>
+                            <div class="cert-row"><div class="cert-label">Tax Obligation</div><div class="cert-value" id="previewObligation">-</div></div>
+                            <div class="cert-row"><div class="cert-label">Station</div><div class="cert-value" id="previewStation">-</div></div>
+                            <div class="cert-row"><div class="cert-label">Status</div><div class="cert-value" id="previewStatus">-</div></div>
+                            <div class="cert-row"><div class="cert-label">Effective From</div><div class="cert-value" id="previewFromDate">-</div></div>
+                            <div class="cert-row"><div class="cert-label">Effective Till</div><div class="cert-value" id="previewTillDate">-</div></div>
                         </div>
                         <div class="cert-footer">
                             <p>Generated on: <span id="previewTimestamp">-</span></p>
@@ -530,29 +608,37 @@
         
         // Update preview in real-time
         function updatePreview() {
-            const pin = document.getElementById('kraPin').value || '-';
-            const name = document.getElementById('taxpayerName').value || '-';
-            const obligation = document.getElementById('taxObligation').value || '-';
-            const status = document.getElementById('pinStatus').value || '-';
-            const effectiveFrom = document.getElementById('effectiveFrom').value || '-';
-            const activity = document.getElementById('activity').value || '-';
+            document.getElementById('previewPin').textContent = document.getElementById('kraPin').value || '-';
+            document.getElementById('previewName').textContent = document.getElementById('taxpayerName').value || '-';
+            document.getElementById('previewEmail').textContent = document.getElementById('inEmail').value || '-';
             
-            document.getElementById('previewPin').textContent = pin;
-            document.getElementById('previewName').textContent = name;
-            document.getElementById('previewObligation').textContent = obligation;
+            const building = document.getElementById('inBuilding').value;
+            const street = document.getElementById('inStreet').value;
+            document.getElementById('previewAddress').textContent = [building, street].filter(Boolean).join(', ') || '-';
             
+            document.getElementById('previewCity').textContent = document.getElementById('inCity').value || '-';
+            document.getElementById('previewCounty').textContent = document.getElementById('inCounty').value || '-';
+            
+            const box = document.getElementById('inBox').value;
+            const postal = document.getElementById('inPostal').value;
+            document.getElementById('previewBox').textContent = box ? `${box} - ${postal}` : '-';
+            
+            document.getElementById('previewObligation').textContent = document.getElementById('taxObligation').value || '-';
+            document.getElementById('previewStation').textContent = document.getElementById('inStation').value || '-';
+            
+            const status = document.getElementById('pinStatus').value;
             const statusEl = document.getElementById('previewStatus');
             statusEl.textContent = status;
             statusEl.className = 'cert-value';
             if (status === 'Active') statusEl.classList.add('active');
-            else if (status === 'Dormant' || status === 'Cancelled') statusEl.classList.add('inactive');
+            else statusEl.classList.add('inactive');
             
-            document.getElementById('previewDate').textContent = effectiveFrom;
-            document.getElementById('previewActivity').textContent = activity;
+            document.getElementById('previewFromDate').textContent = document.getElementById('effectiveFrom').value || '-';
+            document.getElementById('previewTillDate').textContent = document.getElementById('effectiveTill').value || '-';
             document.getElementById('previewTimestamp').textContent = new Date().toLocaleString();
         }
         
-        // Verify & Autofill function - uses live KRA API
+        // Verify & Autofill function
         async function verifyAndAutofill() {
             const pin = document.getElementById('kraPin').value.trim().toUpperCase();
             const idNum = document.getElementById('idNumber').value.trim();
@@ -567,43 +653,30 @@
             try {
                 let result;
                 
-                // Use the actual kraClient from kra_api.js
                 if (window.kraClient) {
                     if (pin) {
-                        console.log('Querying by PIN:', pin);
                         result = await window.kraClient.checkPINByPIN(pin);
                     } else {
-                        console.log('Querying by ID:', idNum);
                         result = await window.kraClient.checkPIN('NATIONAL_ID', idNum);
                     }
                     
                     console.log('KRA API Result:', result);
                     
                     // Autofill form from API response
-                    if (result.TaxpayerPIN) {
-                        document.getElementById('kraPin').value = result.TaxpayerPIN;
-                    }
-                    if (result.TaxpayerName) {
-                        document.getElementById('taxpayerName').value = result.TaxpayerName;
-                    }
-                    if (result.Type) {
-                        document.getElementById('taxObligation').value = result.Type;
-                    }
-                    if (result.Status) {
-                        document.getElementById('pinStatus').value = result.Status;
-                    }
+                    if (result.TaxpayerPIN) document.getElementById('kraPin').value = result.TaxpayerPIN;
+                    if (result.TaxpayerName) document.getElementById('taxpayerName').value = result.TaxpayerName;
+                    if (result.Type) document.getElementById('taxObligation').value = result.Type;
+                    if (result.Status) document.getElementById('pinStatus').value = result.Status;
                     
-                    // Update preview
                     updatePreview();
                     
-                    // Update stats
                     stats.verifications++;
                     localStorage.setItem('userStats', JSON.stringify(stats));
                     document.getElementById('verificationCount').textContent = stats.verifications;
                     
-                    showStatus('PIN verified successfully! Form has been autofilled.');
+                    showStatus('PIN verified! Edit any field below then generate certificate.');
                 } else {
-                    showStatus('API client not loaded. Please refresh the page.', true);
+                    showStatus('API client not loaded. Please refresh.', true);
                 }
             } catch (error) {
                 console.error('Verification error:', error);
@@ -614,78 +687,75 @@
         function showStatus(message, isError = false, isPending = false) {
             const status = document.getElementById('verificationStatus');
             const messageEl = document.getElementById('statusMessage');
-            
             status.classList.remove('error');
             if (isError) status.classList.add('error');
-            
             messageEl.textContent = message;
             status.classList.add('show');
-            
-            if (!isPending) {
-                setTimeout(() => {
-                    status.classList.remove('show');
-                }, 5000);
-            }
+            if (!isPending) setTimeout(() => status.classList.remove('show'), 5000);
         }
         
         function generateCertificate() {
-            const pin = document.getElementById('kraPin').value;
-            const name = document.getElementById('taxpayerName').value;
-            const obligation = document.getElementById('taxObligation').value;
-            const status = document.getElementById('pinStatus').value;
-            const effectiveFrom = document.getElementById('effectiveFrom').value;
-            const activity = document.getElementById('activity').value;
+            const data = {
+                pin: document.getElementById('kraPin').value,
+                name: document.getElementById('taxpayerName').value,
+                email: document.getElementById('inEmail').value,
+                building: document.getElementById('inBuilding').value,
+                street: document.getElementById('inStreet').value,
+                city: document.getElementById('inCity').value,
+                county: document.getElementById('inCounty').value,
+                district: document.getElementById('inDistrict').value,
+                lrNumber: document.getElementById('inLRNumber').value,
+                box: document.getElementById('inBox').value,
+                postal: document.getElementById('inPostal').value,
+                taxArea: document.getElementById('inTaxArea').value,
+                obligation: document.getElementById('taxObligation').value,
+                station: document.getElementById('inStation').value,
+                status: document.getElementById('pinStatus').value,
+                fromDate: document.getElementById('effectiveFrom').value,
+                tillDate: document.getElementById('effectiveTill').value,
+                activity: document.getElementById('activity').value
+            };
             
-            if (!name) {
+            if (!data.name) {
                 showStatus('Please enter at least the Taxpayer Name', true);
                 return;
             }
             
-            // Create certificate HTML for PDF
             const certHtml = `
-                <div style="font-family: 'Inter', Arial, sans-serif; padding: 40px; max-width: 800px; margin: auto; border: 2px solid #7C3AED; border-radius: 12px;">
-                    <div style="text-align: center; margin-bottom: 30px;">
-                        <h1 style="color: #7C3AED; margin-bottom: 5px; font-size: 24px;">KRA PIN Verification Certificate</h1>
-                        <p style="color: #666; margin: 0;">Generated by AkubrecaH Technologies</p>
+                <div style="font-family: Arial, sans-serif; padding: 30px; max-width: 800px; margin: auto; border: 2px solid #7C3AED; border-radius: 12px;">
+                    <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 15px;">
+                        <h1 style="color: #7C3AED; margin: 0 0 5px 0; font-size: 22px;">KRA PIN Verification Certificate</h1>
+                        <p style="color: #666; margin: 0; font-size: 12px;">Generated by AkubrecaH Technologies</p>
                     </div>
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <tr style="border-bottom: 1px solid #eee;">
-                            <td style="padding: 12px 0; font-weight: 600; color: #333; width: 40%;">KRA PIN</td>
-                            <td style="padding: 12px 0; color: #666;">${pin || 'N/A'}</td>
-                        </tr>
-                        <tr style="border-bottom: 1px solid #eee;">
-                            <td style="padding: 12px 0; font-weight: 600; color: #333;">Taxpayer Name</td>
-                            <td style="padding: 12px 0; color: #666;">${name}</td>
-                        </tr>
-                        <tr style="border-bottom: 1px solid #eee;">
-                            <td style="padding: 12px 0; font-weight: 600; color: #333;">Tax Obligation</td>
-                            <td style="padding: 12px 0; color: #666;">${obligation || 'N/A'}</td>
-                        </tr>
-                        <tr style="border-bottom: 1px solid #eee;">
-                            <td style="padding: 12px 0; font-weight: 600; color: #333;">PIN Status</td>
-                            <td style="padding: 12px 0; color: ${status === 'Active' ? '#10B981' : '#EF4444'}; font-weight: 600;">${status}</td>
-                        </tr>
-                        <tr style="border-bottom: 1px solid #eee;">
-                            <td style="padding: 12px 0; font-weight: 600; color: #333;">Effective From</td>
-                            <td style="padding: 12px 0; color: #666;">${effectiveFrom || 'N/A'}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 12px 0; font-weight: 600; color: #333;">Principal Activity</td>
-                            <td style="padding: 12px 0; color: #666;">${activity || 'N/A'}</td>
-                        </tr>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px 0; font-weight: 600; width: 35%;">KRA PIN</td><td style="padding: 8px 0;">${data.pin || 'N/A'}</td></tr>
+                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px 0; font-weight: 600;">Taxpayer Name</td><td style="padding: 8px 0;">${data.name}</td></tr>
+                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px 0; font-weight: 600;">Email</td><td style="padding: 8px 0;">${data.email || 'N/A'}</td></tr>
+                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px 0; font-weight: 600;">Building</td><td style="padding: 8px 0;">${data.building || 'N/A'}</td></tr>
+                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px 0; font-weight: 600;">Street/Road</td><td style="padding: 8px 0;">${data.street || 'N/A'}</td></tr>
+                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px 0; font-weight: 600;">City/Town</td><td style="padding: 8px 0;">${data.city || 'N/A'}</td></tr>
+                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px 0; font-weight: 600;">County</td><td style="padding: 8px 0;">${data.county || 'N/A'}</td></tr>
+                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px 0; font-weight: 600;">District</td><td style="padding: 8px 0;">${data.district || 'N/A'}</td></tr>
+                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px 0; font-weight: 600;">P.O. Box</td><td style="padding: 8px 0;">${data.box ? data.box + ' - ' + data.postal : 'N/A'}</td></tr>
+                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px 0; font-weight: 600;">Tax Area</td><td style="padding: 8px 0;">${data.taxArea || 'N/A'}</td></tr>
+                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px 0; font-weight: 600;">L.R. Number</td><td style="padding: 8px 0;">${data.lrNumber || 'N/A'}</td></tr>
+                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px 0; font-weight: 600;">Tax Obligation</td><td style="padding: 8px 0;">${data.obligation || 'N/A'}</td></tr>
+                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px 0; font-weight: 600;">Station</td><td style="padding: 8px 0;">${data.station || 'N/A'}</td></tr>
+                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px 0; font-weight: 600;">Status</td><td style="padding: 8px 0; color: ${data.status === 'Active' ? '#10B981' : '#EF4444'}; font-weight: 600;">${data.status}</td></tr>
+                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px 0; font-weight: 600;">Effective From</td><td style="padding: 8px 0;">${data.fromDate || 'N/A'}</td></tr>
+                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px 0; font-weight: 600;">Effective Till</td><td style="padding: 8px 0;">${data.tillDate || 'N/A'}</td></tr>
+                        <tr><td style="padding: 8px 0; font-weight: 600;">Principal Activity</td><td style="padding: 8px 0;">${data.activity || 'N/A'}</td></tr>
                     </table>
-                    <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #eee; text-align: center; color: #999; font-size: 12px;">
-                        <p>Generated on: ${new Date().toLocaleString()}</p>
-                        <p>This certificate is for verification purposes only.</p>
+                    <div style="margin-top: 20px; padding-top: 15px; border-top: 2px solid #eee; text-align: center; color: #999; font-size: 11px;">
+                        <p style="margin: 0;">Generated on: ${new Date().toLocaleString()}</p>
+                        <p style="margin: 5px 0 0 0;">This certificate is for verification purposes only.</p>
                     </div>
                 </div>
             `;
             
-            // Generate PDF
             const element = document.createElement('div');
             element.innerHTML = certHtml;
-            
-            const filename = pin ? `KRA_Certificate_${pin}.pdf` : `KRA_Certificate_${name.replace(/\s+/g, '_')}.pdf`;
+            const filename = data.pin ? `KRA_Certificate_${data.pin}.pdf` : `KRA_Certificate_${data.name.replace(/\s+/g, '_')}.pdf`;
             
             html2pdf().set({
                 margin: 10,
@@ -695,11 +765,9 @@
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             }).from(element).save();
             
-            // Update stats
             stats.certificates++;
             localStorage.setItem('userStats', JSON.stringify(stats));
             document.getElementById('certCount').textContent = stats.certificates;
-            
             showStatus('Certificate generated and downloaded!');
         }
         
@@ -710,7 +778,6 @@
             }
         }
         
-        // Initialize preview timestamp
         updatePreview();
     </script>
 </body>
