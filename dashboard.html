@@ -73,7 +73,7 @@
         }
         
         .dashboard-main {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 2rem;
         }
@@ -129,6 +129,12 @@
             font-size: 0.9rem;
         }
         
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        
         .main-card {
             background: white;
             border-radius: 20px;
@@ -157,7 +163,7 @@
         .form-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 1.5rem;
+            gap: 1rem;
         }
         
         .form-group {
@@ -173,15 +179,15 @@
         .form-group label {
             font-weight: 600;
             color: var(--color-text-dark);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
         
         .form-group input,
         .form-group select {
-            padding: 12px 16px;
+            padding: 10px 14px;
             border: 1px solid var(--color-border);
-            border-radius: 10px;
-            font-size: 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
             font-family: inherit;
             transition: all 0.2s;
         }
@@ -196,23 +202,24 @@
         .form-actions {
             display: flex;
             gap: 1rem;
-            margin-top: 2rem;
-            padding-top: 1.5rem;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
             border-top: 1px solid var(--color-border);
         }
         
         .btn-verify {
             background: linear-gradient(135deg, #5FCDB8 0%, #4DB8A5 100%);
             color: #1F1B3D;
-            padding: 14px 28px;
+            padding: 12px 20px;
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 8px;
             font-family: inherit;
+            font-size: 0.9rem;
             transition: all 0.2s;
         }
         
@@ -224,15 +231,16 @@
         .btn-generate {
             background: var(--gradient-primary);
             color: white;
-            padding: 14px 28px;
+            padding: 12px 20px;
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 8px;
             font-family: inherit;
+            font-size: 0.9rem;
             transition: all 0.2s;
         }
         
@@ -241,22 +249,17 @@
             box-shadow: 0 8px 25px rgba(124, 58, 237, 0.3);
         }
         
-        .btn-generate:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
         .verification-status {
             background: #ECFDF5;
             border: 1px solid #10B981;
-            border-radius: 10px;
-            padding: 1rem 1.5rem;
-            margin-bottom: 1.5rem;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
             display: none;
             align-items: center;
             gap: 10px;
             color: #065F46;
+            font-size: 0.9rem;
         }
         
         .verification-status.show {
@@ -267,6 +270,85 @@
             background: #FEF2F2;
             border-color: #EF4444;
             color: #991B1B;
+        }
+        
+        /* Certificate Preview */
+        .cert-preview {
+            background: #fff;
+            border: 2px solid #7C3AED;
+            border-radius: 12px;
+            padding: 2rem;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .cert-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .cert-header h3 {
+            color: #7C3AED;
+            margin: 0 0 0.25rem 0;
+            font-size: 1.25rem;
+        }
+        
+        .cert-header p {
+            color: #666;
+            margin: 0;
+            font-size: 0.85rem;
+        }
+        
+        .cert-body {
+            flex: 1;
+        }
+        
+        .cert-row {
+            display: flex;
+            border-bottom: 1px solid #eee;
+            padding: 0.75rem 0;
+        }
+        
+        .cert-row:last-child {
+            border-bottom: none;
+        }
+        
+        .cert-label {
+            font-weight: 600;
+            color: #333;
+            width: 40%;
+            font-size: 0.9rem;
+        }
+        
+        .cert-value {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .cert-value.active {
+            color: #10B981;
+            font-weight: 600;
+        }
+        
+        .cert-value.inactive {
+            color: #EF4444;
+            font-weight: 600;
+        }
+        
+        .cert-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 2px solid #eee;
+            color: #999;
+            font-size: 0.75rem;
+        }
+        
+        @media (max-width: 1024px) {
+            .content-grid { grid-template-columns: 1fr; }
         }
         
         @media (max-width: 768px) {
@@ -314,60 +396,108 @@
             </div>
         </section>
 
-        <section class="main-card">
-            <div class="card-header">
-                <h2>KRA PIN Verification & Certificate Generator</h2>
-                <button class="btn-verify" onclick="verifyAndAutofill()">
-                    <i data-lucide="search" style="width: 18px;"></i>
-                    Verify & Autofill
-                </button>
-            </div>
-            <div class="card-body">
-                <div class="verification-status" id="verificationStatus">
-                    <i data-lucide="check-circle" style="width: 20px;"></i>
-                    <span id="statusMessage">PIN verified successfully!</span>
+        <section class="content-grid">
+            <!-- Form Card -->
+            <div class="main-card">
+                <div class="card-header">
+                    <h2>Certificate Generator</h2>
                 </div>
-                
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>KRA PIN *</label>
-                        <input type="text" id="kraPin" placeholder="e.g., A012345678Z" maxlength="11">
+                <div class="card-body">
+                    <div class="verification-status" id="verificationStatus">
+                        <i data-lucide="check-circle" style="width: 18px;"></i>
+                        <span id="statusMessage">PIN verified successfully!</span>
                     </div>
-                    <div class="form-group">
-                        <label>ID Number (Optional)</label>
-                        <input type="text" id="idNumber" placeholder="e.g., 12345678">
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>KRA PIN</label>
+                            <input type="text" id="kraPin" placeholder="e.g., A012345678Z" maxlength="11" oninput="updatePreview()">
+                        </div>
+                        <div class="form-group">
+                            <label>ID Number</label>
+                            <input type="text" id="idNumber" placeholder="e.g., 12345678">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Taxpayer Name *</label>
+                            <input type="text" id="taxpayerName" placeholder="Full name as per KRA" oninput="updatePreview()">
+                        </div>
+                        <div class="form-group">
+                            <label>Tax Obligation</label>
+                            <input type="text" id="taxObligation" placeholder="e.g., Income Tax - Resident Individual" oninput="updatePreview()">
+                        </div>
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select id="pinStatus" onchange="updatePreview()">
+                                <option value="Active">Active</option>
+                                <option value="Dormant">Dormant</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Effective From</label>
+                            <input type="date" id="effectiveFrom" oninput="updatePreview()">
+                        </div>
+                        <div class="form-group">
+                            <label>Principal Activity</label>
+                            <input type="text" id="activity" placeholder="e.g., Retail Trade" oninput="updatePreview()">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Taxpayer Name *</label>
-                        <input type="text" id="taxpayerName" placeholder="Full name as per KRA">
-                    </div>
-                    <div class="form-group">
-                        <label>Tax Obligation</label>
-                        <input type="text" id="taxObligation" placeholder="e.g., Income Tax - Resident Individual">
-                    </div>
-                    <div class="form-group">
-                        <label>Status</label>
-                        <select id="pinStatus">
-                            <option value="Active">Active</option>
-                            <option value="Dormant">Dormant</option>
-                            <option value="Cancelled">Cancelled</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Effective From</label>
-                        <input type="date" id="effectiveFrom">
-                    </div>
-                    <div class="form-group full-width">
-                        <label>Principal Activity</label>
-                        <input type="text" id="activity" placeholder="e.g., Retail Trade">
-                    </div>
-                </div>
 
-                <div class="form-actions">
-                    <button class="btn-generate" id="generateBtn" onclick="generateCertificate()" disabled>
-                        <i data-lucide="file-down" style="width: 18px;"></i>
-                        Generate Certificate
-                    </button>
+                    <div class="form-actions">
+                        <button class="btn-verify" onclick="verifyAndAutofill()">
+                            <i data-lucide="search" style="width: 16px;"></i>
+                            Verify & Autofill
+                        </button>
+                        <button class="btn-generate" onclick="generateCertificate()">
+                            <i data-lucide="download" style="width: 16px;"></i>
+                            Generate PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Certificate Preview Card -->
+            <div class="main-card">
+                <div class="card-header">
+                    <h2>Certificate Preview</h2>
+                </div>
+                <div class="card-body">
+                    <div class="cert-preview" id="certPreview">
+                        <div class="cert-header">
+                            <h3>KRA PIN Verification Certificate</h3>
+                            <p>Generated by AkubrecaH Technologies</p>
+                        </div>
+                        <div class="cert-body">
+                            <div class="cert-row">
+                                <div class="cert-label">KRA PIN</div>
+                                <div class="cert-value" id="previewPin">-</div>
+                            </div>
+                            <div class="cert-row">
+                                <div class="cert-label">Taxpayer Name</div>
+                                <div class="cert-value" id="previewName">-</div>
+                            </div>
+                            <div class="cert-row">
+                                <div class="cert-label">Tax Obligation</div>
+                                <div class="cert-value" id="previewObligation">-</div>
+                            </div>
+                            <div class="cert-row">
+                                <div class="cert-label">PIN Status</div>
+                                <div class="cert-value" id="previewStatus">-</div>
+                            </div>
+                            <div class="cert-row">
+                                <div class="cert-label">Effective From</div>
+                                <div class="cert-value" id="previewDate">-</div>
+                            </div>
+                            <div class="cert-row">
+                                <div class="cert-label">Principal Activity</div>
+                                <div class="cert-value" id="previewActivity">-</div>
+                            </div>
+                        </div>
+                        <div class="cert-footer">
+                            <p>Generated on: <span id="previewTimestamp">-</span></p>
+                            <p>This certificate is for verification purposes only.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -398,7 +528,31 @@
         document.getElementById('certCount').textContent = stats.certificates;
         document.getElementById('creditsLeft').textContent = stats.credits;
         
-        // Verify & Autofill function
+        // Update preview in real-time
+        function updatePreview() {
+            const pin = document.getElementById('kraPin').value || '-';
+            const name = document.getElementById('taxpayerName').value || '-';
+            const obligation = document.getElementById('taxObligation').value || '-';
+            const status = document.getElementById('pinStatus').value || '-';
+            const effectiveFrom = document.getElementById('effectiveFrom').value || '-';
+            const activity = document.getElementById('activity').value || '-';
+            
+            document.getElementById('previewPin').textContent = pin;
+            document.getElementById('previewName').textContent = name;
+            document.getElementById('previewObligation').textContent = obligation;
+            
+            const statusEl = document.getElementById('previewStatus');
+            statusEl.textContent = status;
+            statusEl.className = 'cert-value';
+            if (status === 'Active') statusEl.classList.add('active');
+            else if (status === 'Dormant' || status === 'Cancelled') statusEl.classList.add('inactive');
+            
+            document.getElementById('previewDate').textContent = effectiveFrom;
+            document.getElementById('previewActivity').textContent = activity;
+            document.getElementById('previewTimestamp').textContent = new Date().toLocaleString();
+        }
+        
+        // Verify & Autofill function - uses live KRA API
         async function verifyAndAutofill() {
             const pin = document.getElementById('kraPin').value.trim().toUpperCase();
             const idNum = document.getElementById('idNumber').value.trim();
@@ -408,42 +562,39 @@
                 return;
             }
             
-            showStatus('Verifying...', false, true);
+            showStatus('Verifying with KRA...', false, true);
             
             try {
                 let result;
-                if (typeof kraApi !== 'undefined') {
-                    if (pin) {
-                        result = await kraApi.verifyPIN(pin);
-                    } else {
-                        result = await kraApi.verifyByID(idNum);
-                    }
-                } else {
-                    // Mock data for demo
-                    result = {
-                        success: true,
-                        data: {
-                            pin: pin || 'A012345678Z',
-                            name: 'JOHN DOE MWANGI',
-                            obligation: 'Income Tax - Resident Individual',
-                            status: 'Active',
-                            effectiveFrom: '2020-01-15',
-                            activity: 'Retail Trade'
-                        }
-                    };
-                }
                 
-                if (result && result.success) {
-                    // Autofill form
-                    document.getElementById('kraPin').value = result.data.pin || pin;
-                    document.getElementById('taxpayerName').value = result.data.name || '';
-                    document.getElementById('taxObligation').value = result.data.obligation || '';
-                    document.getElementById('pinStatus').value = result.data.status || 'Active';
-                    document.getElementById('effectiveFrom').value = result.data.effectiveFrom || '';
-                    document.getElementById('activity').value = result.data.activity || '';
+                // Use the actual kraClient from kra_api.js
+                if (window.kraClient) {
+                    if (pin) {
+                        console.log('Querying by PIN:', pin);
+                        result = await window.kraClient.checkPINByPIN(pin);
+                    } else {
+                        console.log('Querying by ID:', idNum);
+                        result = await window.kraClient.checkPIN('NATIONAL_ID', idNum);
+                    }
                     
-                    // Enable generate button
-                    document.getElementById('generateBtn').disabled = false;
+                    console.log('KRA API Result:', result);
+                    
+                    // Autofill form from API response
+                    if (result.TaxpayerPIN) {
+                        document.getElementById('kraPin').value = result.TaxpayerPIN;
+                    }
+                    if (result.TaxpayerName) {
+                        document.getElementById('taxpayerName').value = result.TaxpayerName;
+                    }
+                    if (result.Type) {
+                        document.getElementById('taxObligation').value = result.Type;
+                    }
+                    if (result.Status) {
+                        document.getElementById('pinStatus').value = result.Status;
+                    }
+                    
+                    // Update preview
+                    updatePreview();
                     
                     // Update stats
                     stats.verifications++;
@@ -452,11 +603,11 @@
                     
                     showStatus('PIN verified successfully! Form has been autofilled.');
                 } else {
-                    showStatus(result?.message || 'Verification failed. Please check the PIN.', true);
+                    showStatus('API client not loaded. Please refresh the page.', true);
                 }
             } catch (error) {
                 console.error('Verification error:', error);
-                showStatus('Error during verification. Please try again.', true);
+                showStatus('Error: ' + error.message, true);
             }
         }
         
@@ -485,22 +636,22 @@
             const effectiveFrom = document.getElementById('effectiveFrom').value;
             const activity = document.getElementById('activity').value;
             
-            if (!pin || !name) {
-                showStatus('Please fill in required fields (PIN and Name)', true);
+            if (!name) {
+                showStatus('Please enter at least the Taxpayer Name', true);
                 return;
             }
             
-            // Create certificate HTML
+            // Create certificate HTML for PDF
             const certHtml = `
-                <div style="font-family: 'Inter', sans-serif; padding: 40px; max-width: 800px; margin: auto; border: 2px solid #7C3AED; border-radius: 12px;">
+                <div style="font-family: 'Inter', Arial, sans-serif; padding: 40px; max-width: 800px; margin: auto; border: 2px solid #7C3AED; border-radius: 12px;">
                     <div style="text-align: center; margin-bottom: 30px;">
-                        <h1 style="color: #7C3AED; margin-bottom: 5px;">KRA PIN Verification Certificate</h1>
-                        <p style="color: #666;">Generated by AkubrecaH Technologies</p>
+                        <h1 style="color: #7C3AED; margin-bottom: 5px; font-size: 24px;">KRA PIN Verification Certificate</h1>
+                        <p style="color: #666; margin: 0;">Generated by AkubrecaH Technologies</p>
                     </div>
                     <table style="width: 100%; border-collapse: collapse;">
                         <tr style="border-bottom: 1px solid #eee;">
                             <td style="padding: 12px 0; font-weight: 600; color: #333; width: 40%;">KRA PIN</td>
-                            <td style="padding: 12px 0; color: #666;">${pin}</td>
+                            <td style="padding: 12px 0; color: #666;">${pin || 'N/A'}</td>
                         </tr>
                         <tr style="border-bottom: 1px solid #eee;">
                             <td style="padding: 12px 0; font-weight: 600; color: #333;">Taxpayer Name</td>
@@ -534,9 +685,11 @@
             const element = document.createElement('div');
             element.innerHTML = certHtml;
             
+            const filename = pin ? `KRA_Certificate_${pin}.pdf` : `KRA_Certificate_${name.replace(/\s+/g, '_')}.pdf`;
+            
             html2pdf().set({
                 margin: 10,
-                filename: `KRA_Certificate_${pin}.pdf`,
+                filename: filename,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -556,6 +709,9 @@
                 window.location.href = 'index.html';
             }
         }
+        
+        // Initialize preview timestamp
+        updatePreview();
     </script>
 </body>
 </html>
