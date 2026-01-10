@@ -24,44 +24,28 @@
             }
         }
         
-        // Smart Button Logic
-        function handleMainAction() {
+        // Smart Get Started button - redirect to dashboard or login
+        function handleGetStarted() {
             const user = JSON.parse(localStorage.getItem('currentUser'));
-            if (user) {
-                 const tool = document.getElementById('tool');
-                 if(tool) {
-                     tool.style.display = 'block'; // Ensure visible
-                     tool.scrollIntoView({behavior: 'smooth'});
-                 }
+            if (user && user.onboarded) {
+                window.location.href = 'dashboard.html';
+            } else if (user && user.loggedIn) {
+                window.location.href = 'onboarding.html';
             } else {
-                if (typeof openAuth === 'function') {
-                    openAuth();
-                } else {
-                    console.error("Auth module not loaded");
-                }
+                window.location.href = 'login.html';
             }
         }
-
-        // Handle URL Hashes from other pages
+        
+        // Update login link based on user state
         window.addEventListener('DOMContentLoaded', () => {
-             const hash = window.location.hash;
-             if (hash === '#authModal') {
-                 // Slight delay to ensure auth.js is ready
-                 setTimeout(() => {
-                     if (typeof openAuth === 'function') openAuth();
-                 }, 500);
-             } else if (hash === '#tool') {
-                 // If logged in, auth.js will reveal tool, this handles the scroll
-                 setTimeout(() => {
-                      const tool = document.getElementById('tool');
-                      if (tool && tool.style.display !== 'none') {
-                          tool.scrollIntoView({ behavior: 'smooth' });
-                      } else {
-                          // Not logged in, or auth check hasn't finished. 
-                          // If strict auth is on, modal is already open.
-                      }
-                 }, 800);
-             }
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            const loginLink = document.getElementById('loginLink');
+            
+            if (user && user.loggedIn && loginLink) {
+                const name = user.name || user.email.split('@')[0];
+                loginLink.textContent = name;
+                loginLink.href = 'dashboard.html';
+            }
         });
     </script>
     <style>
@@ -230,17 +214,16 @@
     <!-- Navigation -->
     <header class="site-header">
         <nav class="nav-glass">
-            <div class="logo">AkubrecaH</div>
+            <div class="logo"><a href="index.html">AkubrecaH</a></div>
             <div class="nav-links">
                 <a href="index.html" class="nav-link active">Home</a>
                 <a href="pricing.html" class="nav-link">Pricing</a>
                 <a href="about.html" class="nav-link">About</a>
                 <a href="contact.html" class="nav-link">Contact</a>
-                <a href="#" class="nav-link" onclick="openAuth()">Login</a>
             </div>
             <div style="display: flex; gap: 12px; align-items: center;">
-                 <span id="userBadge" class="hidden" style="font-size: 0.8rem; background: var(--color-primary); color: white; padding: 4px 12px; border-radius: 99px; font-weight: 600;">User</span>
-                <button class="btn-primary" onclick="document.getElementById('tool').scrollIntoView({behavior: 'smooth'})">Get Started</button>
+                <a href="login.html" class="nav-link" id="loginLink">Login</a>
+                <button class="btn-primary" onclick="handleGetStarted()">Get Started</button>
             </div>
         </nav>
     </header>
@@ -754,7 +737,7 @@
         <div class="footer-content">
             <div class="footer-cta">
                 <h2>Ready to <br>Get Started?</h2>
-                <a href="#tool" class="footer-btn">Launch Scanner</a>
+                <a href="#tool" class="footer-btn">Launch App</a>
             </div>
             <div class="footer-links">
                 <div style="display: flex; flex-direction: column; gap: 1rem; text-align: left;">
@@ -764,14 +747,13 @@
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 1rem; text-align: left;">
                     <strong>Company</strong>
-                    <a href="about.html" class="footer-link">About</a>
-                    <a href="#" class="footer-link">Blog</a>
+                    <a href="about.html" class="footer-link">About Us</a>
                     <a href="contact.html" class="footer-link">Contact</a>
                 </div>
             </div>
         </div>
         <div class="copyright">
-            &copy; 2026 Akubrecah Technologies. Playful Brutalism Edition.
+            &copy; 2026 Akubrecah Technologies.
         </div>
     </footer>
 
@@ -781,6 +763,12 @@
 
     <script src="kra_api.js"></script>
     <script src="auth.js"></script>
+    <script src="shared-components.js"></script>
+    <script>
+        // Inject the new styled auth modal
+        document.body.appendChild(createAuthModal());
+        if (window.lucide) lucide.createIcons();
+    </script>
     <script>
         let currentMode = 'ID';
 

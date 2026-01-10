@@ -23,7 +23,18 @@ function checkAuthOnLoad() {
 
 // Explicitly expose openAuth to handle the 'force' parameter
 window.openAuth = function(force = false) {
+    // Prefer the new styled auth modal from shared-components
+    const newModal = document.getElementById('authModal');
+    if (newModal && newModal.classList.contains('auth-modal')) {
+        newModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        return;
+    }
+    
+    // Fallback to old modal if new one not available
     const modal = document.getElementById('authModal');
+    if (!modal) return;
+    
     if (force) {
         modal.classList.add('modal-unclosable');
         document.body.classList.add('auth-active-blur'); // Apply blur

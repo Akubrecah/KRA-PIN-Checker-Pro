@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | AkubrecaH Technologies</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        body {
+            background: #F9FAFB;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+        
+        .dashboard-header {
+            background: white;
+            border-bottom: 1px solid var(--color-border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .dashboard-header .logo a {
+            color: var(--color-text-dark);
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 1.25rem;
+        }
+        
+        .dashboard-nav {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .dashboard-nav a {
+            color: var(--color-text);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        
+        .dashboard-nav a:hover,
+        .dashboard-nav a.active {
+            color: var(--color-primary);
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        
+        .dashboard-main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .welcome-section {
+            margin-bottom: 2rem;
+        }
+        
+        .welcome-section h1 {
+            font-size: 2rem;
+            color: var(--color-text-dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .welcome-section p {
+            color: var(--color-text);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid var(--color-border);
+        }
+        
+        .stat-card .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: rgba(124, 58, 237, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-primary);
+            margin-bottom: 1rem;
+        }
+        
+        .stat-card .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--color-text-dark);
+        }
+        
+        .stat-card .stat-label {
+            color: var(--color-text);
+            font-size: 0.9rem;
+        }
+        
+        .main-card {
+            background: white;
+            border-radius: 20px;
+            border: 1px solid var(--color-border);
+            overflow: hidden;
+        }
+        
+        .card-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-header h2 {
+            font-size: 1.25rem;
+            color: var(--color-text-dark);
+            margin: 0;
+        }
+        
+        .card-body {
+            padding: 2rem;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            color: var(--color-text-dark);
+            font-size: 0.9rem;
+        }
+        
+        .form-group input,
+        .form-group select {
+            padding: 12px 16px;
+            border: 1px solid var(--color-border);
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--color-border);
+        }
+        
+        .btn-verify {
+            background: linear-gradient(135deg, #5FCDB8 0%, #4DB8A5 100%);
+            color: #1F1B3D;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        
+        .btn-verify:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(95, 205, 184, 0.3);
+        }
+        
+        .btn-generate {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        
+        .btn-generate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(124, 58, 237, 0.3);
+        }
+        
+        .btn-generate:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .verification-status {
+            background: #ECFDF5;
+            border: 1px solid #10B981;
+            border-radius: 10px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            color: #065F46;
+        }
+        
+        .verification-status.show {
+            display: flex;
+        }
+        
+        .verification-status.error {
+            background: #FEF2F2;
+            border-color: #EF4444;
+            color: #991B1B;
+        }
+        
+        @media (max-width: 768px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .form-group.full-width { grid-column: span 1; }
+            .dashboard-nav { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <header class="dashboard-header">
+        <div class="logo"><a href="index.html">AkubrecaH</a></div>
+        <nav class="dashboard-nav">
+            <a href="dashboard.html" class="active">Dashboard</a>
+            <a href="pricing.html">Pricing</a>
+            <a href="about.html">About</a>
+            <a href="contact.html">Contact</a>
+        </nav>
+        <div class="user-menu">
+            <div class="user-avatar" id="userAvatar" onclick="toggleUserMenu()">U</div>
+        </div>
+    </header>
+
+    <main class="dashboard-main">
+        <section class="welcome-section">
+            <h1>Welcome back, <span id="userName">User</span>!</h1>
+            <p>Verify KRA PINs and generate professional certificates.</p>
+        </section>
+
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon"><i data-lucide="check-circle"></i></div>
+                <div class="stat-value" id="verificationCount">0</div>
+                <div class="stat-label">Verifications Today</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i data-lucide="file-text"></i></div>
+                <div class="stat-value" id="certCount">0</div>
+                <div class="stat-label">Certificates Generated</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i data-lucide="coins"></i></div>
+                <div class="stat-value" id="creditsLeft">5</div>
+                <div class="stat-label">Credits Remaining</div>
+            </div>
+        </section>
+
+        <section class="main-card">
+            <div class="card-header">
+                <h2>KRA PIN Verification & Certificate Generator</h2>
+                <button class="btn-verify" onclick="verifyAndAutofill()">
+                    <i data-lucide="search" style="width: 18px;"></i>
+                    Verify & Autofill
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="verification-status" id="verificationStatus">
+                    <i data-lucide="check-circle" style="width: 20px;"></i>
+                    <span id="statusMessage">PIN verified successfully!</span>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>KRA PIN *</label>
+                        <input type="text" id="kraPin" placeholder="e.g., A012345678Z" maxlength="11">
+                    </div>
+                    <div class="form-group">
+                        <label>ID Number (Optional)</label>
+                        <input type="text" id="idNumber" placeholder="e.g., 12345678">
+                    </div>
+                    <div class="form-group">
+                        <label>Taxpayer Name *</label>
+                        <input type="text" id="taxpayerName" placeholder="Full name as per KRA">
+                    </div>
+                    <div class="form-group">
+                        <label>Tax Obligation</label>
+                        <input type="text" id="taxObligation" placeholder="e.g., Income Tax - Resident Individual">
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="pinStatus">
+                            <option value="Active">Active</option>
+                            <option value="Dormant">Dormant</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Effective From</label>
+                        <input type="date" id="effectiveFrom">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Principal Activity</label>
+                        <input type="text" id="activity" placeholder="e.g., Retail Trade">
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button class="btn-generate" id="generateBtn" onclick="generateCertificate()" disabled>
+                        <i data-lucide="file-down" style="width: 18px;"></i>
+                        Generate Certificate
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="kra_api.js"></script>
+    <script>
+        lucide.createIcons();
+        
+        // Check authentication
+        const user = JSON.parse(localStorage.getItem('currentUser'));
+        if (!user || !user.loggedIn) {
+            window.location.href = 'login.html';
+        } else if (!user.onboarded) {
+            window.location.href = 'onboarding.html';
+        }
+        
+        // Update UI with user info
+        if (user) {
+            const name = user.name || user.email.split('@')[0];
+            document.getElementById('userName').textContent = name;
+            document.getElementById('userAvatar').textContent = name.charAt(0).toUpperCase();
+        }
+        
+        // Load stats from localStorage
+        const stats = JSON.parse(localStorage.getItem('userStats')) || { verifications: 0, certificates: 0, credits: 5 };
+        document.getElementById('verificationCount').textContent = stats.verifications;
+        document.getElementById('certCount').textContent = stats.certificates;
+        document.getElementById('creditsLeft').textContent = stats.credits;
+        
+        // Verify & Autofill function
+        async function verifyAndAutofill() {
+            const pin = document.getElementById('kraPin').value.trim().toUpperCase();
+            const idNum = document.getElementById('idNumber').value.trim();
+            
+            if (!pin && !idNum) {
+                showStatus('Please enter a KRA PIN or ID Number', true);
+                return;
+            }
+            
+            showStatus('Verifying...', false, true);
+            
+            try {
+                let result;
+                if (typeof kraApi !== 'undefined') {
+                    if (pin) {
+                        result = await kraApi.verifyPIN(pin);
+                    } else {
+                        result = await kraApi.verifyByID(idNum);
+                    }
+                } else {
+                    // Mock data for demo
+                    result = {
+                        success: true,
+                        data: {
+                            pin: pin || 'A012345678Z',
+                            name: 'JOHN DOE MWANGI',
+                            obligation: 'Income Tax - Resident Individual',
+                            status: 'Active',
+                            effectiveFrom: '2020-01-15',
+                            activity: 'Retail Trade'
+                        }
+                    };
+                }
+                
+                if (result && result.success) {
+                    // Autofill form
+                    document.getElementById('kraPin').value = result.data.pin || pin;
+                    document.getElementById('taxpayerName').value = result.data.name || '';
+                    document.getElementById('taxObligation').value = result.data.obligation || '';
+                    document.getElementById('pinStatus').value = result.data.status || 'Active';
+                    document.getElementById('effectiveFrom').value = result.data.effectiveFrom || '';
+                    document.getElementById('activity').value = result.data.activity || '';
+                    
+                    // Enable generate button
+                    document.getElementById('generateBtn').disabled = false;
+                    
+                    // Update stats
+                    stats.verifications++;
+                    localStorage.setItem('userStats', JSON.stringify(stats));
+                    document.getElementById('verificationCount').textContent = stats.verifications;
+                    
+                    showStatus('PIN verified successfully! Form has been autofilled.');
+                } else {
+                    showStatus(result?.message || 'Verification failed. Please check the PIN.', true);
+                }
+            } catch (error) {
+                console.error('Verification error:', error);
+                showStatus('Error during verification. Please try again.', true);
+            }
+        }
+        
+        function showStatus(message, isError = false, isPending = false) {
+            const status = document.getElementById('verificationStatus');
+            const messageEl = document.getElementById('statusMessage');
+            
+            status.classList.remove('error');
+            if (isError) status.classList.add('error');
+            
+            messageEl.textContent = message;
+            status.classList.add('show');
+            
+            if (!isPending) {
+                setTimeout(() => {
+                    status.classList.remove('show');
+                }, 5000);
+            }
+        }
+        
+        function generateCertificate() {
+            const pin = document.getElementById('kraPin').value;
+            const name = document.getElementById('taxpayerName').value;
+            const obligation = document.getElementById('taxObligation').value;
+            const status = document.getElementById('pinStatus').value;
+            const effectiveFrom = document.getElementById('effectiveFrom').value;
+            const activity = document.getElementById('activity').value;
+            
+            if (!pin || !name) {
+                showStatus('Please fill in required fields (PIN and Name)', true);
+                return;
+            }
+            
+            // Create certificate HTML
+            const certHtml = `
+                <div style="font-family: 'Inter', sans-serif; padding: 40px; max-width: 800px; margin: auto; border: 2px solid #7C3AED; border-radius: 12px;">
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <h1 style="color: #7C3AED; margin-bottom: 5px;">KRA PIN Verification Certificate</h1>
+                        <p style="color: #666;">Generated by AkubrecaH Technologies</p>
+                    </div>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr style="border-bottom: 1px solid #eee;">
+                            <td style="padding: 12px 0; font-weight: 600; color: #333; width: 40%;">KRA PIN</td>
+                            <td style="padding: 12px 0; color: #666;">${pin}</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #eee;">
+                            <td style="padding: 12px 0; font-weight: 600; color: #333;">Taxpayer Name</td>
+                            <td style="padding: 12px 0; color: #666;">${name}</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #eee;">
+                            <td style="padding: 12px 0; font-weight: 600; color: #333;">Tax Obligation</td>
+                            <td style="padding: 12px 0; color: #666;">${obligation || 'N/A'}</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #eee;">
+                            <td style="padding: 12px 0; font-weight: 600; color: #333;">PIN Status</td>
+                            <td style="padding: 12px 0; color: ${status === 'Active' ? '#10B981' : '#EF4444'}; font-weight: 600;">${status}</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #eee;">
+                            <td style="padding: 12px 0; font-weight: 600; color: #333;">Effective From</td>
+                            <td style="padding: 12px 0; color: #666;">${effectiveFrom || 'N/A'}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px 0; font-weight: 600; color: #333;">Principal Activity</td>
+                            <td style="padding: 12px 0; color: #666;">${activity || 'N/A'}</td>
+                        </tr>
+                    </table>
+                    <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #eee; text-align: center; color: #999; font-size: 12px;">
+                        <p>Generated on: ${new Date().toLocaleString()}</p>
+                        <p>This certificate is for verification purposes only.</p>
+                    </div>
+                </div>
+            `;
+            
+            // Generate PDF
+            const element = document.createElement('div');
+            element.innerHTML = certHtml;
+            
+            html2pdf().set({
+                margin: 10,
+                filename: `KRA_Certificate_${pin}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            }).from(element).save();
+            
+            // Update stats
+            stats.certificates++;
+            localStorage.setItem('userStats', JSON.stringify(stats));
+            document.getElementById('certCount').textContent = stats.certificates;
+            
+            showStatus('Certificate generated and downloaded!');
+        }
+        
+        function toggleUserMenu() {
+            if (confirm('Logout?')) {
+                localStorage.removeItem('currentUser');
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
+</body>
+</html>

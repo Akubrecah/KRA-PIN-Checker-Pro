@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | AkubrecaH Technologies</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            background: linear-gradient(135deg, #3B2D6B 0%, #2D1F5E 100%);
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .auth-container {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
+        
+        .auth-left {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 4rem;
+            color: white;
+        }
+        
+        .auth-left .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 3rem;
+        }
+        
+        .auth-left .logo a {
+            color: white;
+            text-decoration: none;
+        }
+        
+        .auth-left h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+        
+        .auth-left p {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            max-width: 400px;
+        }
+        
+        .auth-right {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+        }
+        
+        .auth-card {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 420px;
+        }
+        
+        .auth-card h2 {
+            color: white;
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .auth-card .subtitle {
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 2rem;
+        }
+        
+        .auth-field {
+            margin-bottom: 1.25rem;
+        }
+        
+        .auth-field label {
+            display: block;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .auth-field input {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            color: white;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        
+        .auth-field input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+        
+        .auth-field input:focus {
+            outline: none;
+            border-color: #5FCDB8;
+            background: rgba(255, 255, 255, 0.12);
+        }
+        
+        .auth-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .auth-remember {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        
+        .auth-remember input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #5FCDB8;
+        }
+        
+        .auth-forgot {
+            color: #5FCDB8;
+            font-size: 0.9rem;
+            text-decoration: none;
+        }
+        
+        .btn-auth-primary {
+            width: 100%;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #5FCDB8 0%, #4DB8A5 100%);
+            color: #1F1B3D;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            margin-bottom: 1rem;
+        }
+        
+        .btn-auth-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(95, 205, 184, 0.3);
+        }
+        
+        .auth-divider {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            margin: 1.5rem 0;
+            position: relative;
+        }
+        
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .auth-divider::before { left: 0; }
+        .auth-divider::after { right: 0; }
+        
+        .btn-auth-secondary {
+            width: 100%;
+            padding: 14px 24px;
+            background: transparent;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+        }
+        
+        .btn-auth-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .auth-footer {
+            text-align: center;
+            margin-top: 2rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .auth-footer a {
+            color: #5FCDB8;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 900px) {
+            .auth-left { display: none; }
+            .auth-right { flex: 1; padding: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-left">
+            <div class="logo"><a href="index.html">AkubrecaH</a></div>
+            <h1>Welcome Back</h1>
+            <p>Log in to verify KRA PINs instantly, generate professional certificates, and manage your compliance workflow.</p>
+        </div>
+        
+        <div class="auth-right">
+            <div class="auth-card">
+                <h2>Log In</h2>
+                <p class="subtitle">Enter your credentials to continue</p>
+                
+                <form id="loginForm">
+                    <div class="auth-field">
+                        <label>Your Email</label>
+                        <input type="email" id="email" required placeholder="you@example.com">
+                    </div>
+                    
+                    <div class="auth-field">
+                        <label>Your Password</label>
+                        <input type="password" id="password" required placeholder="••••••••••••">
+                    </div>
+                    
+                    <div class="auth-options">
+                        <label class="auth-remember">
+                            <input type="checkbox" id="remember">
+                            <span>Remember me</span>
+                        </label>
+                        <a href="#" class="auth-forgot">Forgot password?</a>
+                    </div>
+                    
+                    <button type="submit" class="btn-auth-primary">Log In</button>
+                </form>
+                
+                <div class="auth-footer">
+                    Don't have an account? <a href="signup.html">Sign Up</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        
+        // Check if already logged in
+        const user = JSON.parse(localStorage.getItem('currentUser'));
+        if (user && user.onboarded) {
+            window.location.href = 'dashboard.html';
+        }
+        
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            // Simulate login (replace with real Supabase auth)
+            const userData = {
+                email: email,
+                role: 'personal',
+                loggedIn: true,
+                onboarded: true // Assuming returning users are onboarded
+            };
+            localStorage.setItem('currentUser', JSON.stringify(userData));
+            window.location.href = 'dashboard.html';
+        });
+    </script>
+</body>
+</html>

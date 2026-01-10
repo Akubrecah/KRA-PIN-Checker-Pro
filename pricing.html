@@ -10,22 +10,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
-    <!-- Navigation -->
-    <header class="site-header">
-        <nav class="nav-glass">
-            <div class="logo"><a href="index.html">AkubrecaH</a></div>
-            <div class="nav-links">
-                <a href="index.html" class="nav-link">Home</a>
-                <a href="pricing.html" class="nav-link active">Pricing</a>
-                <a href="about.html" class="nav-link">About</a>
-                <a href="contact.html" class="nav-link">Contact</a>
-            </div>
-            <div style="display: flex; gap: 12px; align-items: center;">
-                <a href="#" class="nav-link" id="loginLink" onclick="openAuthModal()">Login</a>
-                <button class="btn-primary" onclick="window.location.href='index.html#tool'">Get Started</button>
-            </div>
-        </nav>
-    </header>
+    <!-- Header and Footer injected by shared-components.js -->
 
     <main>
         <!-- Pricing Hero -->
@@ -53,7 +38,7 @@
                         <li style="display: flex; gap: 10px; align-items: center;"><i data-lucide="check" style="width: 18px; color: var(--color-primary);"></i> 1 PDF Certificate</li>
                         <li style="display: flex; gap: 10px; align-items: center;"><i data-lucide="check" style="width: 18px; color: var(--color-primary);"></i> Instant Download</li>
                     </ul>
-                    <button class="btn-secondary" style="width: 100%;" onclick="window.location.href='index.html#authModal'">Get Started</button>
+                    <button class="btn-secondary" style="width: 100%;" onclick="handleGetStarted()">Get Started</button>
                 </div>
                 
                 <!-- Cyber Premium Plan -->
@@ -70,19 +55,19 @@
                         <li style="display: flex; gap: 10px; align-items: center;"><i data-lucide="check" style="width: 18px;"></i> Priority Support</li>
                         <li style="display: flex; gap: 10px; align-items: center;"><i data-lucide="check" style="width: 18px;"></i> Batch Processing</li>
                     </ul>
-                    <button style="width: 100%; background: white; color: var(--color-primary); padding: 14px 28px; border-radius: 99px; font-weight: 600; border: none; cursor: pointer;" onclick="window.location.href='index.html#authModal'">Subscribe Now</button>
+                    <button style="width: 100%; background: white; color: var(--color-primary); padding: 14px 28px; border-radius: 99px; font-weight: 600; border: none; cursor: pointer;" onclick="handleGetStarted()">Subscribe Now</button>
                 </div>
                 
-                <!-- Developer API Plan -->
+                <!-- Enterprise Plan -->
                 <div style="background: white; border-radius: 16px; padding: 2.5rem; border: 1px solid var(--color-border); box-shadow: var(--shadow-card);">
                     <div style="width: 48px; height: 48px; background: rgba(124, 58, 237, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; color: var(--color-primary);">
-                        <i data-lucide="code" style="width: 24px;"></i>
+                        <i data-lucide="building" style="width: 24px;"></i>
                     </div>
-                    <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--color-text-dark);">Developer API</h3>
+                    <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--color-text-dark);">Enterprise</h3>
                     <div style="font-size: 3rem; font-weight: 800; color: var(--color-text-dark); margin: 1rem 0;">Custom</div>
                     <ul style="list-style: none; margin-bottom: 2rem; color: var(--color-text); display: flex; flex-direction: column; gap: 0.75rem;">
-                        <li style="display: flex; gap: 10px; align-items: center;"><i data-lucide="check" style="width: 18px; color: var(--color-primary);"></i> Full API Access</li>
-                        <li style="display: flex; gap: 10px; align-items: center;"><i data-lucide="check" style="width: 18px; color: var(--color-primary);"></i> High Rate Limits</li>
+                        <li style="display: flex; gap: 10px; align-items: center;"><i data-lucide="check" style="width: 18px; color: var(--color-primary);"></i> Volume Discounts</li>
+                        <li style="display: flex; gap: 10px; align-items: center;"><i data-lucide="check" style="width: 18px; color: var(--color-primary);"></i> Dedicated Support</li>
                         <li style="display: flex; gap: 10px; align-items: center;"><i data-lucide="check" style="width: 18px; color: var(--color-primary);"></i> SLA Guarantees</li>
                     </ul>
                     <button class="btn-secondary" style="width: 100%;" onclick="window.location.href='contact.html'">Contact Sales</button>
@@ -91,104 +76,11 @@
         </section>
     </main>
 
-    <!-- Auth Modal -->
-    <div id="authModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
-        <div class="modal-content" style="background: white; padding: 2.5rem; border-radius: 16px; max-width: 400px; margin: 10% auto; position: relative;">
-            <span onclick="closeAuthModal()" style="position: absolute; top: 16px; right: 20px; font-size: 1.5rem; cursor: pointer; color: var(--color-text);">&times;</span>
-            <h2 style="margin-bottom: 1.5rem; color: var(--color-text-dark);">Sign In</h2>
-            <form id="authForm">
-                <div style="margin-bottom: 1rem;">
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--color-text-dark);">Email</label>
-                    <input type="email" id="authEmail" required style="width: 100%; padding: 12px 16px; border: 1px solid var(--color-border); border-radius: 8px;">
-                </div>
-                <div style="margin-bottom: 1.5rem;">
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--color-text-dark);">Password</label>
-                    <input type="password" id="authPassword" required style="width: 100%; padding: 12px 16px; border: 1px solid var(--color-border); border-radius: 8px;">
-                </div>
-                <button type="submit" class="btn-primary" style="width: 100%;">Sign In</button>
-            </form>
-            <p style="text-align: center; margin-top: 1rem; color: var(--color-text);">
-                Don't have an account? <a href="#" onclick="toggleAuthMode(); return false;" style="color: var(--color-primary); font-weight: 600;">Sign Up</a>
-            </p>
-        </div>
-    </div>
-
-    <footer class="fat-footer">
-        <div class="footer-content">
-            <div class="footer-cta">
-                <h2>Ready to <br>Get Started?</h2>
-                <a href="index.html#tool" class="footer-btn">Launch Scanner</a>
-            </div>
-            <div class="footer-links">
-                <div style="display: flex; flex-direction: column; gap: 1rem; text-align: left;">
-                    <strong>Product</strong>
-                    <a href="pricing.html" class="footer-link">Pricing</a>
-                    <a href="about.html" class="footer-link">About</a>
-                </div>
-                <div style="display: flex; flex-direction: column; gap: 1rem; text-align: left;">
-                    <strong>Company</strong>
-                    <a href="about.html" class="footer-link">About</a>
-                    <a href="contact.html" class="footer-link">Contact</a>
-                </div>
-            </div>
-        </div>
-        <div class="copyright">
-            &copy; 2026 Akubrecah Technologies.
-        </div>
-    </footer>
-
+    <script src="shared-components.js"></script>
     <script>
-        lucide.createIcons();
-        
-        // Auth Modal Functions
-        function openAuthModal() {
-            document.getElementById('authModal').style.display = 'block';
-        }
-        
-        function closeAuthModal() {
-            document.getElementById('authModal').style.display = 'none';
-        }
-        
-        let isSignUp = false;
-        function toggleAuthMode() {
-            isSignUp = !isSignUp;
-            document.querySelector('#authModal h2').textContent = isSignUp ? 'Create Account' : 'Sign In';
-            document.querySelector('#authForm button').textContent = isSignUp ? 'Sign Up' : 'Sign In';
-            document.querySelector('#authModal p').innerHTML = isSignUp 
-                ? 'Already have an account? <a href="#" onclick="toggleAuthMode(); return false;" style="color: var(--color-primary); font-weight: 600;">Sign In</a>'
-                : 'Don\'t have an account? <a href="#" onclick="toggleAuthMode(); return false;" style="color: var(--color-primary); font-weight: 600;">Sign Up</a>';
-        }
-        
-        document.getElementById('authForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const email = document.getElementById('authEmail').value;
-            // Simulate login
-            localStorage.setItem('currentUser', JSON.stringify({ email: email, role: 'personal' }));
-            closeAuthModal();
-            window.location.href = 'index.html#tool';
+        document.addEventListener('DOMContentLoaded', function() {
+            initPage('pricing');
         });
-        
-        // Check if user is logged in
-        window.addEventListener('DOMContentLoaded', function() {
-            const user = JSON.parse(localStorage.getItem('currentUser'));
-            if (user) {
-                document.getElementById('loginLink').textContent = user.email.split('@')[0];
-                document.getElementById('loginLink').onclick = function() {
-                    if(confirm('Logout?')) {
-                        localStorage.removeItem('currentUser');
-                        location.reload();
-                    }
-                };
-            }
-        });
-        
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            const modal = document.getElementById('authModal');
-            if (event.target == modal) {
-                closeAuthModal();
-            }
-        }
     </script>
 </body>
 </html>
