@@ -26,10 +26,10 @@ window.openAuth = function(force = false) {
     const modal = document.getElementById('authModal');
     if (force) {
         modal.classList.add('modal-unclosable');
+        document.body.classList.add('auth-active-blur'); // Apply blur
         // Override close behaviors
         window.onclick = function(event) {
             if (event.target == modal && modal.classList.contains('modal-unclosable')) {
-                // Do nothing, block close
                 return;
             }
              if (event.target == document.getElementById('certModal')) {
@@ -41,6 +41,7 @@ window.openAuth = function(force = false) {
         }
     } else {
         modal.classList.remove('modal-unclosable');
+        document.body.classList.remove('auth-active-blur'); // Remove blur
          // Restore standard window click behavior
         window.onclick = function(event) {
             if (event.target == modal) {
@@ -56,7 +57,7 @@ window.openAuth = function(force = false) {
     }
     modal.style.display = 'block';
     // Hide 'Cancel' button if forced
-    const cancelBtn = modal.querySelector('.btn-secondary'); // Assuming there is one
+    const cancelBtn = modal.querySelector('.btn-secondary'); 
     if(cancelBtn) {
         cancelBtn.style.display = force ? 'none' : 'block';
     }
@@ -67,6 +68,7 @@ window.closeAuth = function() {
     const modal = document.getElementById('authModal');
     if (!modal.classList.contains('modal-unclosable')) {
         modal.style.display = 'none';
+        document.body.classList.remove('auth-active-blur');
     }
 }
 
@@ -78,46 +80,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // Check for cert generation gating
     const generateBtn = document.getElementById('generateCertBtn');
     if (generateBtn) {
-        // Remove old listeners to prevent duplication if re-run
-        const newBtn = generateBtn.cloneNode(true);
-        generateBtn.parentNode.replaceChild(newBtn, generateBtn);
-        
-        newBtn.addEventListener('click', () => {
-             // Logic: Must be logged in (handled by checkAuthOnLoad generally, but double check)
+        console.log("Attaching listener to #generateCertBtn");
+        generateBtn.addEventListener('click', (e) => {
+             console.log("#generateCertBtn clicked, checking auth...");
+             // Logic: Must be logged in
              if (!currentUser) {
+                 console.log("No user logged in, forcing auth modal.");
+                 e.preventDefault();
+                 e.stopPropagation();
                  openAuth(true);
                  return;
              }
              
-             // Gating Logic: Only Cyber (Premium) or Personal users who just PAID can generate.
-             // For simplicity based on user request "one must be premium":
-             const isPremium = currentUser.role === 'cyber';
-             const isPaidPersonal = currentUser.role === 'personal' && currentUser.hasPaidSession === true; // Assuming we track this
-             
-             if (isPremium || isPaidPersonal) {
-                 // proceed (call original logic from index.html - we need to trigger it manually or expose it)
-                 // Since logic is in index.html, we dispatch a custom event or call a global function
-                 // Best approach: Let index.html handle the 'click', but we intercept it? 
-                 // Actually, better to overwrite the click handler inside index.html or here if we moved logic.
-                 // The 'generateCertBtn' logic is currently in index.html line 847.
-                 // We will update index.html to check permissions properly.
-                 
-                 // Dispatch event for index.html to catch
-                 window.dispatchEvent(new CustomEvent('certGenerationApproved'));
-             } else {
-                 Swal.fire({
-                    title: 'Premium Feature',
-                    text: 'Certificate generation is available for Premium users or after payment.',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Upgrade / Pay',
-                    cancelButtonText: 'Close'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        openPricing();
-                    }
-                });
-             }
+             // Gating Logic Relaxed: Allow ALL logged-in users 
+             console.log("Auth check passed, dispatching certGenerationApproved.");
+             window.dispatchEvent(new CustomEvent('certGenerationApproved'));
         });
     }
 });
@@ -237,19 +214,27 @@ function logout() {
 }
 
 function updateUI() {
+    const toolSection = document.getElementById('tool');
+    const heroSection = document.querySelector('.hero-section');
+    
     if (currentUser) {
         userBadge.textContent = currentUser.role.toUpperCase();
         userBadge.classList.remove('hidden');
         authBtn.textContent = 'Logout';
+        if (toolSection) toolSection.style.display = 'block';
+        // Optional: Hide hero or adjust it? keeping it for now.
     } else {
         userBadge.classList.add('hidden');
         authBtn.textContent = 'Login / Register';
+        if (toolSection) toolSection.style.display = 'none';
     }
 }
 
 // --- Payment & Gating Logic --- //
 
-window.checkAccess = function() {
+// --- Payment & Gating Logic --- //
+
+window.checkAccess = async function() {
     if (!currentUser) {
         Swal.fire({
             icon: 'info',
@@ -262,70 +247,159 @@ window.checkAccess = function() {
         return false;
     }
 
-    if (currentUser.role === 'personal') {
-        if (currentUser.credits > 0) {
-            return true;
-        } else {
-            // Show Pay-per-use Prompt
-            Swal.fire({
-                title: 'Payment Required',
-                text: "Pay 100 KES to perform this check and generate a certificate.",
-                icon: 'info',
-                showCancelButton: true,
-                confirmButtonText: 'Pay 100 KES',
-                confirmButtonColor: '#10b981'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    processPayment(100);
-                }
-            });
-            return false;
+    // Refresh user data to get latest credits/subscription
+    try {
+        const freshUser = await window.SupabaseClient.credits.get(currentUser.id);
+        if (freshUser) {
+            currentUser.credits = freshUser.credits;
+            currentUser.subscription_status = freshUser.subscription_status;
+            updateUI(); // Reflect changes in badge etc
         }
-    } else if (currentUser.role === 'cyber') {
-        if (currentSubscription === 'active') {
+    } catch (e) {
+        console.warn("Failed to refresh user credits:", e);
+    }
+
+    // Cyber Subscription Check
+    if (currentUser.role === 'cyber') {
+        if (currentUser.subscription_status === 'active') {
             return true;
         } else {
             openPricing();
             return false;
         }
     }
+
+    // Personal Credit Check
+    if (currentUser.role === 'personal') {
+        if (currentUser.credits > 0) {
+            return true;
+        } else {
+            // Show Pay-per-use Prompt
+            Swal.fire({
+                title: 'Insufficient Credits',
+                text: "You need 1 credit to perform this check. Cost: 100 KES.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Pay 100 KES',
+                confirmButtonColor: '#10b981'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    startPayment('personal');
+                }
+            });
+            return false;
+        }
+    }
+    
     return false;
 };
 
 function startPayment(plan) {
+    if (!currentUser) {
+        openAuth();
+        return;
+    }
+
     pricingModal.style.display = 'none';
     let amount = plan === 'personal' ? 100 : (plan === 'cyber_monthly' ? 2500 : 800);
+    let type = plan === 'personal' ? 'credit_purchase' : 'subscription';
     
-    // Simulate Payment Modal
+    // Prompt for Phone Number
     Swal.fire({
-        title: `Pay ${amount} KES`,
-        text: "Simulating M-PESA STK Push...",
-        icon: 'info',
+        title: 'M-PESA Payment',
+        text: `Enter your M-PESA phone number to pay ${amount} KES`,
+        input: 'tel',
+        inputPlaceholder: 'e.g., 0712345678',
         showCancelButton: true,
-        confirmButtonText: 'Simulate Success',
+        confirmButtonText: 'Pay Now',
         showLoaderOnConfirm: true,
-        preConfirm: () => {
-            return new Promise((resolve) => setTimeout(resolve, 2000));
-        }
+        preConfirm: (phone) => {
+            if (!phone) {
+                Swal.showValidationMessage('Please enter a phone number');
+            }
+            return fetch('/api/pay', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    phoneNumber: phone,
+                    amount: amount,
+                    userId: currentUser.id,
+                    type: type
+                })
+            })
+            .then(response => {
+                if (!response.ok) throw new Error(response.statusText);
+                return response.json();
+            })
+            .catch(error => {
+                Swal.showValidationMessage(`Request failed: ${error}`);
+            });
+        },
+        allowOutsideClick: () => !Swal.isLoading()
     }).then((result) => {
-        if (result.isConfirmed) {
-            processPayment(amount);
+        if (result.isConfirmed && result.value && result.value.success) {
+            const checkoutReqID = result.value.checkoutRequestID;
+            
+            Swal.fire({
+                title: 'Payment Initiated',
+                text: 'Check your phone for the M-PESA prompt. Waiting for confirmation...',
+                icon: 'info',
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                willOpen: () => {
+                    Swal.showLoading();
+                    pollPaymentStatus(checkoutReqID);
+                }
+            });
         }
     });
 }
 
+function pollPaymentStatus(checkoutRequestID) {
+    let attempts = 0;
+    const maxAttempts = 60; // 2 minutes (assuming 2s interval)
+    
+    const interval = setInterval(async () => {
+        attempts++;
+        try {
+            const res = await fetch(`/api/pay/status/${checkoutRequestID}`);
+            const data = await res.json();
+            
+            if (data.status === 'completed') {
+                clearInterval(interval);
+                
+                // Refresh User Data
+                const freshUser = await window.SupabaseClient.credits.get(currentUser.id);
+                if (freshUser) {
+                    currentUser.credits = freshUser.credits;
+                    currentUser.subscription_status = freshUser.subscription_status;
+                    updateUI();
+                }
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Payment Successful!',
+                    text: 'Your credits/subscription have been updated.',
+                    timer: 3000
+                });
+            } else if (data.status === 'failed') {
+                 clearInterval(interval);
+                 Swal.fire('Payment Failed', 'The transaction was cancelled or failed.', 'error');
+            }
+            
+            if (attempts >= maxAttempts) {
+                clearInterval(interval);
+                Swal.fire('Timeout', 'Payment confirmation timed out. Please check your balance later.', 'warning');
+            }
+        } catch (e) {
+            console.error("Polling error:", e);
+        }
+    }, 3000);
+}
+
+// Deprecated Mock Process Function
 function processPayment(amount) {
-    // Mock Update Logic
-    if (currentUser.role === 'personal') {
-        currentUser.credits += 1;
-    } else {
-        currentSubscription = 'active';
-    }
-    
-    Swal.fire('Payment Successful', 'You can now proceed.', 'success');
-    
-    // If waiting on the tool, scroll to it
-    document.getElementById('tool').scrollIntoView({ behavior: 'smooth' });
+    console.warn("processPayment is deprecated. Use startPayment.");
 }
 
 // Event Listeners

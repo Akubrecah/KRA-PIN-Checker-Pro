@@ -15,6 +15,7 @@
     <!-- Add Supabase & SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="supabase-client.js"></script>
     <script>
         tailwind.config = {
             prefix: 'tw-',
@@ -22,6 +23,46 @@
                 preflight: false,
             }
         }
+        
+        // Smart Button Logic
+        function handleMainAction() {
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            if (user) {
+                 const tool = document.getElementById('tool');
+                 if(tool) {
+                     tool.style.display = 'block'; // Ensure visible
+                     tool.scrollIntoView({behavior: 'smooth'});
+                 }
+            } else {
+                if (typeof openAuth === 'function') {
+                    openAuth();
+                } else {
+                    console.error("Auth module not loaded");
+                }
+            }
+        }
+
+        // Handle URL Hashes from other pages
+        window.addEventListener('DOMContentLoaded', () => {
+             const hash = window.location.hash;
+             if (hash === '#authModal') {
+                 // Slight delay to ensure auth.js is ready
+                 setTimeout(() => {
+                     if (typeof openAuth === 'function') openAuth();
+                 }, 500);
+             } else if (hash === '#tool') {
+                 // If logged in, auth.js will reveal tool, this handles the scroll
+                 setTimeout(() => {
+                      const tool = document.getElementById('tool');
+                      if (tool && tool.style.display !== 'none') {
+                          tool.scrollIntoView({ behavior: 'smooth' });
+                      } else {
+                          // Not logged in, or auth check hasn't finished. 
+                          // If strict auth is on, modal is already open.
+                      }
+                 }, 800);
+             }
+        });
     </script>
     <style>
         /* Standalone PDF Generator Styles */
@@ -191,10 +232,10 @@
         <nav class="nav-glass">
             <div class="logo">AkubrecaH</div>
             <div class="nav-links">
-                <a href="#tool" class="nav-link">Scanner</a>
+                <a href="index.html" class="nav-link active">Home</a>
                 <a href="pricing.html" class="nav-link">Pricing</a>
                 <a href="about.html" class="nav-link">About</a>
-                <a href="api-docs.html" class="nav-link">API</a>
+                <a href="contact.html" class="nav-link">Contact</a>
                 <a href="#" class="nav-link" onclick="openAuth()">Login</a>
             </div>
             <div style="display: flex; gap: 12px; align-items: center;">
@@ -204,31 +245,52 @@
         </nav>
     </header>
 
-    <main>
         <!-- Hero Section -->
-        <section class="hero-section">
-            <div class="hero-text">
-                <h1>Verify PINs with <br><span class="text-gradient">Total Confidence.</span></h1>
-                <p>The developer-first tool for instant KRA PIN validation and A4 compliant certificate generation. Fast, secure, and brutally efficient.</p>
-                <div style="display: flex; gap: 1rem;">
-                    <button class="btn-primary" onclick="document.getElementById('tool').scrollIntoView({behavior: 'smooth'})" style="padding: 16px 32px; font-size: 1.1rem;">
-                        Start Scanning <i data-lucide="arrow-right" style="display: inline; width: 18px;"></i>
+        <section class="hero-section" style="position: relative;">
+            <!-- Purple Glow Effect -->
+            <div style="position: absolute; top: -200px; left: 50%; transform: translateX(-50%); width: 800px; height: 600px; background: var(--gradient-glow); pointer-events: none; z-index: 0;"></div>
+            
+            <div class="hero-text" style="position: relative; z-index: 1;">
+                <h1 style="color: var(--color-text-dark);">Verify Any <br><span class="text-gradient">KRA PIN</span> Instantly.</h1>
+                <p style="font-size: 1.15rem; color: var(--color-text); margin-bottom: 2.5rem;">Professional tax compliance tool for individuals and businesses. Instant validations, automated PDF certificates, and developer-first APIs.</p>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <button class="btn-primary" onclick="handleMainAction()">
+                        Start for Free
                     </button>
-                    <!-- <button class="btn-primary" style="background: #F4F4F5; color: black;">Watch Demo</button> -->
+                    <button class="btn-secondary" onclick="window.location.href='about.html'">
+                        <i data-lucide="play-circle" style="width: 20px;"></i> Learn More
+                    </button>
+                </div>
                 </div>
             </div>
             <div class="hero-visual">
-                <div class="shape-blob"></div>
-                <!-- 3D Element Placeholder (Can replace with Spline/Image later) -->
-                <div style="position: relative; z-index: 10; background: white; padding: 2rem; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); transform: rotate(-5deg);">
-                    <div style="font-weight: 800; font-size: 1.5rem; margin-bottom: 1rem;">Status: Valid</div>
-                    <div style="height: 12px; background: #F4F4F5; border-radius: 6px; width: 100%; margin-bottom: 1rem;"></div>
-                    <div style="height: 12px; background: #F4F4F5; border-radius: 6px; width: 70%;"></div>
-                    <div style="margin-top: 1.5rem; display: flex; gap: 10px;">
-                        <div style="width: 40px; height: 40px; background: #E4E4E7; border-radius: 50%;"></div>
-                        <div>
-                            <div style="font-weight: 700; font-size: 0.9rem;">Jane Doe</div>
-                            <div style="font-size: 0.8rem; color: #71717A;">Resident Individual</div>
+                <!-- Abstract Premium Shapes -->
+                <div style="position: absolute; width: 600px; height: 600px; background: radial-gradient(circle, rgba(59,130,246,0.1) 0%, rgba(255,255,255,0) 70%); top: -100px; right: -100px;"></div>
+                
+                <div class="glass-panel" style="position: relative; z-index: 10; padding: 2.5rem; border-radius: 16px; background: white; box-shadow: var(--shadow-card); border: 1px solid var(--color-border); width: 80%;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 2rem; border-bottom: 1px solid var(--color-border); padding-bottom: 1rem;">
+                        <span style="font-weight: 700; color: var(--color-text-dark);">PIN Validation Status</span>
+                        <span style="color: #10B981; font-weight: 600; background: #ECFDF5; padding: 4px 12px; border-radius: 99px; font-size: 0.85rem;">Active & Valid</span>
+                    </div>
+                    
+                    <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 1.5rem;">
+                         <div style="width: 48px; height: 48px; background: #F1F5F9; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #64748B;">
+                             <i data-lucide="user" style="width: 24px;"></i>
+                         </div>
+                         <div>
+                             <div style="font-weight: 700; color: var(--color-text-dark);">Jane Doe</div>
+                             <div style="font-size: 0.9rem; color: #64748B;">P051XXXXXXZ</div>
+                         </div>
+                    </div>
+
+                    <div style="background: #F8FAFC; padding: 1rem; border-radius: 8px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 0.5rem;">
+                            <span style="color: #64748B;">Station</span>
+                            <span style="font-weight: 600; color: var(--color-text-dark);">North Nairobi</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.9rem;">
+                            <span style="color: #64748B;">Obligation</span>
+                            <span style="font-weight: 600; color: var(--color-text-dark);">Income Tax Resident</span>
                         </div>
                     </div>
                 </div>
@@ -256,6 +318,44 @@
             </div>
         </div>
 
+        <!-- How It Works: 3 Steps (Inspired by landing-page.io) -->
+        <section style="padding: 5rem 2rem; max-width: 1100px; margin: 0 auto;">
+            <h2 style="font-size: 2.5rem; text-align: center; margin-bottom: 1rem; color: var(--color-text-dark);">How It Works</h2>
+            <p style="text-align: center; color: var(--color-text); margin-bottom: 3rem; max-width: 600px; margin-left: auto; margin-right: auto;">From ID to verified PIN certificate in 3 simple steps.</p>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; position: relative;">
+                <!-- Step 1 -->
+                <div style="background: white; border-radius: 16px; padding: 2rem; text-align: center; border: 1px solid var(--color-border); box-shadow: var(--shadow-card);">
+                    <div style="width: 56px; height: 56px; background: rgba(124, 58, 237, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: var(--color-primary);">
+                        <i data-lucide="search" style="width: 28px;"></i>
+                    </div>
+                    <div style="font-size: 0.85rem; font-weight: 600; color: var(--color-primary); margin-bottom: 0.5rem;">Step 1</div>
+                    <h3 style="font-size: 1.25rem; margin-bottom: 0.75rem; color: var(--color-text-dark);">Enter Your ID</h3>
+                    <p style="color: var(--color-text); font-size: 0.95rem;">Input your National ID, Alien ID, or existing KRA PIN to begin the verification.</p>
+                </div>
+                
+                <!-- Step 2 -->
+                <div style="background: white; border-radius: 16px; padding: 2rem; text-align: center; border: 1px solid var(--color-border); box-shadow: var(--shadow-card);">
+                    <div style="width: 56px; height: 56px; background: rgba(124, 58, 237, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: var(--color-primary);">
+                        <i data-lucide="check-circle" style="width: 28px;"></i>
+                    </div>
+                    <div style="font-size: 0.85rem; font-weight: 600; color: var(--color-primary); margin-bottom: 0.5rem;">Step 2</div>
+                    <h3 style="font-size: 1.25rem; margin-bottom: 0.75rem; color: var(--color-text-dark);">Instant Verification</h3>
+                    <p style="color: var(--color-text); font-size: 0.95rem;">Our system queries the KRA sandbox in milliseconds and returns your full taxpayer details.</p>
+                </div>
+                
+                <!-- Step 3 -->
+                <div style="background: white; border-radius: 16px; padding: 2rem; text-align: center; border: 1px solid var(--color-border); box-shadow: var(--shadow-card);">
+                    <div style="width: 56px; height: 56px; background: rgba(124, 58, 237, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: var(--color-primary);">
+                        <i data-lucide="file-down" style="width: 28px;"></i>
+                    </div>
+                    <div style="font-size: 0.85rem; font-weight: 600; color: var(--color-primary); margin-bottom: 0.5rem;">Step 3</div>
+                    <h3 style="font-size: 1.25rem; margin-bottom: 0.75rem; color: var(--color-text-dark);">Download Certificate</h3>
+                    <p style="color: var(--color-text); font-size: 0.95rem;">Generate and download a professional A4 PDF certificate, ready for print or submission.</p>
+                </div>
+            </div>
+        </section>
+
         <!-- Bento Grid Features -->
         <section class="bento-section">
             <h2 style="font-size: 3rem; margin-bottom: 3rem; text-align: center;">Everything you need.</h2>
@@ -276,7 +376,7 @@
                     <p>Generate high-fidelity, print-ready PDF certificates compliant with 2026 standards.</p>
                     <div style="margin-top: 2rem; background: rgba(255,255,255,0.1); border-radius: 12px; height: 100px;"></div>
                 </div>
-                <div class="bento-card bento-primary">
+                <div class="bento-card bento-primary" style="grid-column: span 2;">
                     <div class="bento-icon" style="color: var(--color-primary);"><i data-lucide="code"></i></div>
                     <h3>Dev Friendly</h3>
                     <p>Built for integration.</p>
@@ -290,7 +390,7 @@
         </section>
 
         <!-- Tool Section -->
-        <section id="tool">
+        <section id="tool" style="display: none;">
             <div class="tool-wrapper">
                 <header>
                     <h1>Scanner Console</h1>
@@ -660,8 +760,7 @@
                 <div style="display: flex; flex-direction: column; gap: 1rem; text-align: left;">
                     <strong>Product</strong>
                     <a href="pricing.html" class="footer-link">Pricing</a>
-                    <a href="api-docs.html" class="footer-link">API</a>
-                    <a href="api-docs.html" class="footer-link">Documentation</a>
+                    <a href="about.html" class="footer-link">About</a>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 1rem; text-align: left;">
                     <strong>Company</strong>
@@ -717,6 +816,10 @@
         async function handleSubmission(e, mode) {
             e.preventDefault();
             
+            // 1. Check Access / Credits
+            const canProceed = await window.checkAccess();
+            if (!canProceed) return;
+
             const errorArea = document.getElementById('errorArea');
             const resultsArea = document.getElementById('resultsArea');
             const btnText = document.getElementById(`btnText${mode}`);
@@ -763,17 +866,34 @@
                     document.getElementById('extraInfoArea').style.display = 'block';
                 }
                 
+                // 2. Log Usage & Deduct Credit (if Personal)
+                if (currentUser && currentUser.role === 'personal') {
+                    await window.SupabaseClient.credits.deduct(currentUser.id);
+                    // Update local state to reflect deduction
+                    currentUser.credits = Math.max(0, currentUser.credits - 1);
+                    updateUI();
+                }
+                
+                // Log the check
+                await window.SupabaseClient.usage.logCheck(currentUser.id, mode, 'success');
+
                 clearInterval(statusInt);
                 resultsArea.style.display = 'block';
                 resultsArea.scrollIntoView({ behavior: 'smooth' });
             } catch (err) {
+                console.error("Submission Error:", err);
                 clearInterval(statusInt);
                 let msg = err.message;
                 if (msg.includes('EAI_AGAIN') || msg.includes('fetch failed')) {
-                    msg = "KRA Sandbox is temporarily unreachable. We are automatically retrying behind the scenes, please try again in a moment.";
+                    msg = "KRA Sandbox is temporarily unreachable. We are automatically retrying behind the scenes.";
                 }
                 errorArea.textContent = msg;
                 errorArea.style.display = 'block';
+                
+                // Log failed attempt
+                if (currentUser) {
+                    await window.SupabaseClient.usage.logCheck(currentUser.id, mode, 'failed');
+                }
             } finally {
                 clearInterval(statusInt);
                 submitBtn.disabled = false;
@@ -849,6 +969,7 @@
         // LISTENER UPDATE: Security Gating handled in auth.js
         // This event is dispatched ONLY if auth.js approves the user role/payment
         window.addEventListener('certGenerationApproved', () => {
+            console.log("Certificate generation approved, opening modal...");
             updateDigitalPreview();
             modal.style.display = 'block';
         });
