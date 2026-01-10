@@ -45,6 +45,19 @@ h1, h2, h3, h4, h5 {
 a { text-decoration: none; color: inherit; }
 button { font-family: inherit; }
 
+/* --- Authentication Modals --- */
+.modal-unclosable .modal-header span {
+    display: none !important; /* Hide close button */
+}
+
+.modal-unclosable {
+    pointer-events: auto !important;
+}
+
+.modal-unclosable .modal-content {
+    animation: none !important; /* Prevent shake to dismiss effects if any */
+}
+
 /* --- Utility Classes --- */
 .container {
     max-width: 1400px;

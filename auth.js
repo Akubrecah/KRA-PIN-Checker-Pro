@@ -8,6 +8,120 @@ const SUPABASE_KEY = 'PLACEHOLDER_KEY';
 let currentUser = null;
 let currentSubscription = null;
 
+// --- Access Control & Initialization ---
+
+function checkAuthOnLoad() {
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+    if (user) {
+        currentUser = user;
+        updateUI(); // Call the existing updateUI function
+    } else {
+        // No user found, FORCE LOGIN
+        openAuth(true); // true = force/unclosable
+    }
+}
+
+// Explicitly expose openAuth to handle the 'force' parameter
+window.openAuth = function(force = false) {
+    const modal = document.getElementById('authModal');
+    if (force) {
+        modal.classList.add('modal-unclosable');
+        // Override close behaviors
+        window.onclick = function(event) {
+            if (event.target == modal && modal.classList.contains('modal-unclosable')) {
+                // Do nothing, block close
+                return;
+            }
+             if (event.target == document.getElementById('certModal')) {
+                document.getElementById('certModal').style.display = 'none';
+            }
+             if (event.target == document.getElementById('pricingModal')) {
+                 document.getElementById('pricingModal').style.display = 'none';
+            }
+        }
+    } else {
+        modal.classList.remove('modal-unclosable');
+         // Restore standard window click behavior
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                closeAuth();
+            }
+             if (event.target == document.getElementById('certModal')) {
+                document.getElementById('certModal').style.display = 'none';
+            }
+             if (event.target == document.getElementById('pricingModal')) {
+                 document.getElementById('pricingModal').style.display = 'none';
+            }
+        }
+    }
+    modal.style.display = 'block';
+    // Hide 'Cancel' button if forced
+    const cancelBtn = modal.querySelector('.btn-secondary'); // Assuming there is one
+    if(cancelBtn) {
+        cancelBtn.style.display = force ? 'none' : 'block';
+    }
+}
+
+// Override closeAuth to respect forcing
+window.closeAuth = function() {
+    const modal = document.getElementById('authModal');
+    if (!modal.classList.contains('modal-unclosable')) {
+        modal.style.display = 'none';
+    }
+}
+
+
+// Initialize on Page Load
+document.addEventListener('DOMContentLoaded', () => {
+    checkAuthOnLoad();
+    
+    // Check for cert generation gating
+    const generateBtn = document.getElementById('generateCertBtn');
+    if (generateBtn) {
+        // Remove old listeners to prevent duplication if re-run
+        const newBtn = generateBtn.cloneNode(true);
+        generateBtn.parentNode.replaceChild(newBtn, generateBtn);
+        
+        newBtn.addEventListener('click', () => {
+             // Logic: Must be logged in (handled by checkAuthOnLoad generally, but double check)
+             if (!currentUser) {
+                 openAuth(true);
+                 return;
+             }
+             
+             // Gating Logic: Only Cyber (Premium) or Personal users who just PAID can generate.
+             // For simplicity based on user request "one must be premium":
+             const isPremium = currentUser.role === 'cyber';
+             const isPaidPersonal = currentUser.role === 'personal' && currentUser.hasPaidSession === true; // Assuming we track this
+             
+             if (isPremium || isPaidPersonal) {
+                 // proceed (call original logic from index.html - we need to trigger it manually or expose it)
+                 // Since logic is in index.html, we dispatch a custom event or call a global function
+                 // Best approach: Let index.html handle the 'click', but we intercept it? 
+                 // Actually, better to overwrite the click handler inside index.html or here if we moved logic.
+                 // The 'generateCertBtn' logic is currently in index.html line 847.
+                 // We will update index.html to check permissions properly.
+                 
+                 // Dispatch event for index.html to catch
+                 window.dispatchEvent(new CustomEvent('certGenerationApproved'));
+             } else {
+                 Swal.fire({
+                    title: 'Premium Feature',
+                    text: 'Certificate generation is available for Premium users or after payment.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Upgrade / Pay',
+                    cancelButtonText: 'Close'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        openPricing();
+                    }
+                });
+             }
+        });
+    }
+});
+
 // Initialize Supabase if keys exist (mock for now if invalid)
 let supabase;
 try {

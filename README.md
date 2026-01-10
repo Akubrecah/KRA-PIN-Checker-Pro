@@ -28,6 +28,32 @@ This project successfully pivoted to a bold new aesthetic:
 -   Client-side rendering using `html2pdf.js` (Zero server overhead).
 -   Perfect alignment with Official KRA 2026 templates.
 
+## 🚀 How to Run
+
+### Prerequisite
+- Node.js installed (v16 or higher)
+
+### 1. Install Dependencies
+```bash
+npm install
+```
+
+### 2. Configure Environment
+The project comes with a `.env` file. By default, it is configured for the **KRA Sandbox**.
+To switch to Production, update `KRA_API_BASE_URL` in `.env` to the correct production endpoint.
+
+### 3. Start the Server
+```bash
+node server.js
+```
+The server will start at `http://localhost:3000`.
+
+### 4. Access the App
+Open your browser and visit:
+[http://localhost:3000](http://localhost:3000)
+
+---
+
 ### 3. Monetization & Access Control
 -   **Authentication**: Multi-role support (Personal vs. Cyber/Business).
 -   **Pay-Per-Use**: Micro-transaction simulation for Personal users (100 KES/check).

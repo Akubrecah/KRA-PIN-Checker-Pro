@@ -198,7 +198,7 @@
                 <a href="#" class="nav-link" onclick="openAuth()">Login</a>
             </div>
             <div style="display: flex; gap: 12px; align-items: center;">
-                 <span id="userBadge" class="hidden" style="font-size: 0.8rem; background: var(--color-primary); color: white; padding: 4px 12px; border-radius: 99px; font-weight: 600;">Guest</span>
+                 <span id="userBadge" class="hidden" style="font-size: 0.8rem; background: var(--color-primary); color: white; padding: 4px 12px; border-radius: 99px; font-weight: 600;">User</span>
                 <button class="btn-primary" onclick="document.getElementById('tool').scrollIntoView({behavior: 'smooth'})">Get Started</button>
             </div>
         </nav>
@@ -846,7 +846,9 @@
             if (event.target == modal) closeModal();
         }
 
-        generateCertBtn.addEventListener('click', () => {
+        // LISTENER UPDATE: Security Gating handled in auth.js
+        // This event is dispatched ONLY if auth.js approves the user role/payment
+        window.addEventListener('certGenerationApproved', () => {
             updateDigitalPreview();
             modal.style.display = 'block';
         });

@@ -10,18 +10,20 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
+const BASE_URL = process.env.KRA_API_BASE_URL || 'https://sbx.kra.go.ke';
+
 const KRA_CONFIG = {
     pinByID: {
         consumerKey: process.env.KRA_ID_CONSUMER_KEY,
         consumerSecret: process.env.KRA_ID_CONSUMER_SECRET,
-        tokenEndpoint: 'https://sbx.kra.go.ke/v1/token/generate?grant_type=client_credentials',
-        pinCheckerEndpoint: 'https://sbx.kra.go.ke/checker/v1/pin'
+        tokenEndpoint: `${BASE_URL}/v1/token/generate?grant_type=client_credentials`,
+        pinCheckerEndpoint: `${BASE_URL}/checker/v1/pin`
     },
     pinByPIN: {
         consumerKey: process.env.KRA_PIN_CONSUMER_KEY,
         consumerSecret: process.env.KRA_PIN_CONSUMER_SECRET,
-        tokenEndpoint: 'https://sbx.kra.go.ke/v1/token/generate?grant_type=client_credentials',
-        pinCheckerEndpoint: 'https://sbx.kra.go.ke/checker/v1/pinbypin'
+        tokenEndpoint: `${BASE_URL}/v1/token/generate?grant_type=client_credentials`,
+        pinCheckerEndpoint: `${BASE_URL}/checker/v1/pinbypin`
     }
 };
 
@@ -47,7 +49,7 @@ async function getAccessToken(apiType, retries = 2) {
         const timeout = setTimeout(() => controller.abort(), 15000);
 
         try {
-            console.log(`[AUTH] Attempt ${i + 1} for ${apiType}: Fetching token...`);
+            console.log(`[AUTH] Attempt ${i + 1} for ${apiType}: Fetching token from ${config.tokenEndpoint}...`);
             const response = await fetch(config.tokenEndpoint, {
                 method: 'GET',
                 headers: { 
@@ -59,6 +61,16 @@ async function getAccessToken(apiType, retries = 2) {
             });
 
             clearTimeout(timeout);
+
+            // Robust JSON handling
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                const text = await response.text();
+                // Log the first 200 chars of HTML to debug
+                console.error(`[AUTH] Failed: Received non-JSON response from KRA: ${text.substring(0, 200)}...`);
+                throw new Error(`KRA Endpoint Verification Failed: Server returned ${response.status} ${response.statusText} (Not JSON)`);
+            }
+
             const data = await response.json();
             if (!response.ok) throw new Error(data.errorMessage || 'Auth failed');
 
