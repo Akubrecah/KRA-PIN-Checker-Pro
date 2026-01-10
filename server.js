@@ -101,6 +101,9 @@ app.post('/api/check-pin', async (req, res) => {
 
             try {
                 console.log(`[CHECK-ID] Attempt ${i + 1}: PIN info for ${taxpayerID}`);
+                console.log(`[CHECK-ID] URL: ${config.pinCheckerEndpoint}`);
+                console.log(`[CHECK-ID] Body: ${JSON.stringify({ TaxpayerType: taxpayerType, TaxpayerID: taxpayerID })}`);
+
                 const response = await fetch(config.pinCheckerEndpoint, {
                     method: 'POST',
                     headers: {
@@ -117,7 +120,19 @@ app.post('/api/check-pin', async (req, res) => {
                 });
 
                 clearTimeout(timeout);
-                const data = await response.json();
+                
+                const rawText = await response.text();
+                console.log(`[CHECK-ID] Raw Response Status: ${response.status}`);
+                console.log(`[CHECK-ID] Raw Response Body: ${rawText.substring(0, 1000)}`); // Log first 1000 chars
+
+                let data;
+                try {
+                    data = JSON.parse(rawText);
+                } catch (e) {
+                    console.error('[CHECK-ID] Failed to parse JSON response');
+                    throw new Error('Invalid JSON response from KRA');
+                }
+
                 if (!response.ok) {
                     console.log(`[CHECK-ID] KRA returned error: ${JSON.stringify(data)}`);
                     return res.status(response.status).json(data);

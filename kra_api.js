@@ -11,7 +11,7 @@ async function checkPIN(taxpayerType, taxpayerID) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                taxpayerType: taxpayerType,
+                taxpayerType: taxpayerType === 'NATIONAL_ID' ? 'KE' : taxpayerType,
                 taxpayerID: taxpayerID
             })
         });
