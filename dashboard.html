@@ -723,19 +723,156 @@
             
             const today = new Date().toLocaleDateString('en-GB');
             
-            // Official KRA-style certificate - A4 single page
+            // Original KRA Certificate Design - A4 Single Page
             const certHtml = `
-                <div style="font-family: Arial, sans-serif; width: 210mm; min-height: 297mm; padding: 20mm 15mm; margin: 0 auto; background: white; box-sizing: border-box;">
-                    <!-- Header -->
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid black; padding-bottom: 12px; margin-bottom: 12px;">
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <img src="image1.jpeg" alt="KRA Logo" style="height: 50px;" onerror="this.style.display='none'">
-                            <div style="font-weight: 900; font-size: 13px; line-height: 1.1;">KENYA REVENUE<br>AUTHORITY</div>
+                <style>
+                    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+                    
+                    .kra-cert-container {
+                        width: 210mm;
+                        height: 297mm;
+                        background: white;
+                        padding: 2.5cm;
+                        box-sizing: border-box;
+                        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+                        color: black;
+                        display: flex;
+                        flex-direction: column;
+                    }
+                    
+                    .kra-cert-header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: flex-start;
+                        border-bottom: 2px solid black;
+                        padding-bottom: 15px;
+                        margin-bottom: 20px;
+                    }
+                    
+                    .kra-logo-section {
+                        display: flex;
+                        align-items: center;
+                        gap: 12px;
+                    }
+                    
+                    .kra-logo-section img {
+                        height: 60px;
+                    }
+                    
+                    .kra-text {
+                        font-weight: 900;
+                        font-size: 16px;
+                        line-height: 1.1;
+                    }
+                    
+                    .kra-cert-label {
+                        background: #e5e7eb;
+                        padding: 10px 40px;
+                        font-weight: 900;
+                        font-size: 20px;
+                        border: 1px solid #d1d5db;
+                    }
+                    
+                    .kra-contact-info {
+                        text-align: right;
+                        font-size: 9px;
+                        line-height: 1.4;
+                    }
+                    
+                    .kra-date-pin-section {
+                        display: flex;
+                        justify-content: flex-end;
+                        margin-bottom: 20px;
+                    }
+                    
+                    .kra-date-pin-box {
+                        text-align: right;
+                        line-height: 1.5;
+                    }
+                    
+                    .kra-cert-date {
+                        font-size: 11px;
+                    }
+                    
+                    .kra-pin-label {
+                        font-weight: 700;
+                        font-size: 12px;
+                        margin-top: 5px;
+                    }
+                    
+                    .kra-pin-value {
+                        font-weight: 500;
+                        font-size: 11px;
+                    }
+                    
+                    .kra-intro-text {
+                        text-align: center;
+                        font-size: 11px;
+                        margin-bottom: 20px;
+                    }
+                    
+                    .kra-section-title {
+                        text-align: center;
+                        font-weight: 700;
+                        font-size: 13px;
+                        margin-bottom: 10px;
+                    }
+                    
+                    .kra-cert-table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-bottom: 20px;
+                        font-size: 11px;
+                    }
+                    
+                    .kra-cert-table th,
+                    .kra-cert-table td {
+                        border: 1px solid black;
+                        padding: 3px 6px;
+                        text-align: left;
+                    }
+                    
+                    .kra-cert-table .bg-grey {
+                        font-weight: 700;
+                        width: 30%;
+                    }
+                    
+                    .kra-obligation-table th,
+                    .kra-obligation-table td {
+                        text-align: center;
+                        vertical-align: middle;
+                        font-size: 9px;
+                        padding: 2px 4px;
+                    }
+                    
+                    .kra-obligation-table thead th {
+                        font-weight: 700;
+                    }
+                    
+                    .kra-footer-text {
+                        font-size: 10px;
+                        line-height: 1.5;
+                        margin-top: auto;
+                        padding-top: 20px;
+                    }
+                    
+                    .kra-disclaimer {
+                        border-top: 1px solid black;
+                        padding-top: 5px;
+                        margin-top: 30px;
+                        font-weight: 700;
+                        font-size: 10px;
+                    }
+                </style>
+                
+                <div class="kra-cert-container">
+                    <div class="kra-cert-header">
+                        <div class="kra-logo-section">
+                            <img src="image1.jpeg" alt="KRA Logo" onerror="this.style.display='none'">
+                            <div class="kra-text">KENYA REVENUE<br>AUTHORITY</div>
                         </div>
-                        <div style="background: #e5e7eb; padding: 6px 30px; font-weight: 900; font-size: 16px; border: 1px solid #d1d5db;">
-                            PIN Certificate
-                        </div>
-                        <div style="text-align: right; font-size: 8px; line-height: 1.3;">
+                        <div class="kra-cert-label">PIN Certificate</div>
+                        <div class="kra-contact-info">
                             <strong>For General Tax Questions<br>Contact KRA Call Centre</strong><br>
                             Tel: +254 (020) 4999 999<br>
                             Cell: +254(0711)099 999<br>
@@ -743,88 +880,83 @@
                         </div>
                     </div>
 
-                    <!-- Date and PIN -->
-                    <div style="text-align: right; margin-bottom: 12px; line-height: 1.4;">
-                        <div style="font-size: 9px;"><strong>Certificate Date :</strong> ${today}</div>
-                        <div style="font-weight: 700; font-size: 10px; margin-top: 4px;">Personal Identification Number</div>
-                        <div style="font-weight: 500; font-size: 9px;">${data.pin || 'N/A'}</div>
+                    <div class="kra-date-pin-section">
+                        <div class="kra-date-pin-box">
+                            <div class="kra-cert-date"><strong>Certificate Date :</strong> ${today}</div>
+                            <div class="kra-pin-label">Personal Identification Number</div>
+                            <div class="kra-pin-value">${data.pin || 'N/A'}</div>
+                        </div>
                     </div>
 
-                    <!-- Intro Text -->
-                    <div style="text-align: center; font-size: 9px; margin-bottom: 12px;">
+                    <div class="kra-intro-text">
                         This is to certify that taxpayer shown herein has been registered with Kenya Revenue Authority
                     </div>
 
-                    <!-- Taxpayer Information -->
-                    <div style="text-align: center; font-weight: 700; font-size: 11px; margin-bottom: 6px;">Taxpayer Information</div>
-                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 9px;">
+                    <div class="kra-section-title">Taxpayer Information</div>
+                    <table class="kra-cert-table">
                         <tr>
-                            <td style="border: 1px solid black; padding: 4px 6px; font-weight: 700; width: 25%; background: #f5f5f5;">Taxpayer Name</td>
-                            <td style="border: 1px solid black; padding: 4px 6px;">${data.name}</td>
+                            <td class="bg-grey">Taxpayer Name</td>
+                            <td>${data.name}</td>
                         </tr>
                         <tr>
-                            <td style="border: 1px solid black; padding: 4px 6px; font-weight: 700; background: #f5f5f5;">Email Address</td>
-                            <td style="border: 1px solid black; padding: 4px 6px;">${data.email || 'N/A'}</td>
-                        </tr>
-                    </table>
-
-                    <!-- Registered Address -->
-                    <div style="text-align: center; font-weight: 700; font-size: 11px; margin-bottom: 6px;">Registered Address</div>
-                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 9px;">
-                        <tr>
-                            <td style="border: 1px solid black; padding: 4px 6px; width: 50%;"><strong>L.R. Number :</strong> ${data.lrNumber || ''}</td>
-                            <td style="border: 1px solid black; padding: 4px 6px;"><strong>Building :</strong> ${data.building || ''}</td>
-                        </tr>
-                        <tr>
-                            <td style="border: 1px solid black; padding: 4px 6px;"><strong>Street/Road :</strong> ${data.street || ''}</td>
-                            <td style="border: 1px solid black; padding: 4px 6px;"><strong>City/Town :</strong> ${data.city || ''}</td>
-                        </tr>
-                        <tr>
-                            <td style="border: 1px solid black; padding: 4px 6px;"><strong>County :</strong> ${data.county || ''}</td>
-                            <td style="border: 1px solid black; padding: 4px 6px;"><strong>District :</strong> ${data.district || ''}</td>
-                        </tr>
-                        <tr>
-                            <td style="border: 1px solid black; padding: 4px 6px;"><strong>Tax Area :</strong> ${data.taxArea || ''}</td>
-                            <td style="border: 1px solid black; padding: 4px 6px;"><strong>Station :</strong> ${data.station || ''}</td>
-                        </tr>
-                        <tr>
-                            <td style="border: 1px solid black; padding: 4px 6px;"><strong>P. O. Box :</strong> ${data.box || ''}</td>
-                            <td style="border: 1px solid black; padding: 4px 6px;"><strong>Postal Code :</strong> ${data.postal || ''}</td>
+                            <td class="bg-grey">Email Address</td>
+                            <td>${data.email || 'N/A'}</td>
                         </tr>
                     </table>
 
-                    <!-- Tax Obligation(s) Registration -->
-                    <div style="text-align: center; font-weight: 700; font-size: 11px; margin-bottom: 6px;">Tax Obligation(s) Registration</div>
-                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 8px;">
+                    <div class="kra-section-title">Registered Address</div>
+                    <table class="kra-cert-table">
+                        <tr>
+                            <td><strong>L.R. Number :</strong> ${data.lrNumber || ''}</td>
+                            <td><strong>Building :</strong> ${data.building || ''}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Street/Road :</strong> ${data.street || ''}</td>
+                            <td><strong>City/Town :</strong> ${data.city || ''}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>County :</strong> ${data.county || ''}</td>
+                            <td><strong>District :</strong> ${data.district || ''}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tax Area :</strong> ${data.taxArea || ''}</td>
+                            <td><strong>Station :</strong> ${data.station || ''}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>P. O. Box :</strong> ${data.box || ''}</td>
+                            <td><strong>Postal Code :</strong> ${data.postal || ''}</td>
+                        </tr>
+                    </table>
+
+                    <div class="kra-section-title">Tax Obligation(s) Registration</div>
+                    <table class="kra-cert-table kra-obligation-table">
                         <thead>
                             <tr>
-                                <th style="border: 1px solid black; padding: 4px; text-align: center; font-weight: 700; background: #f5f5f5;">Sr. No.</th>
-                                <th style="border: 1px solid black; padding: 4px; text-align: center; font-weight: 700; background: #f5f5f5;">Tax Obligation(s)</th>
-                                <th style="border: 1px solid black; padding: 4px; text-align: center; font-weight: 700; background: #f5f5f5;">Effective From Date</th>
-                                <th style="border: 1px solid black; padding: 4px; text-align: center; font-weight: 700; background: #f5f5f5;">Effective Till</th>
-                                <th style="border: 1px solid black; padding: 4px; text-align: center; font-weight: 700; background: #f5f5f5;">Status</th>
+                                <th>Sr. No.</th>
+                                <th>Tax Obligation(s)</th>
+                                <th>Effective From Date</th>
+                                <th>Effective Till</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td style="border: 1px solid black; padding: 4px; text-align: center;">1</td>
-                                <td style="border: 1px solid black; padding: 4px; text-align: center;">${data.obligation || 'Income Tax - Resident Individual'}</td>
-                                <td style="border: 1px solid black; padding: 4px; text-align: center;">${data.fromDate || 'N/A'}</td>
-                                <td style="border: 1px solid black; padding: 4px; text-align: center;">${data.tillDate || 'N.A.'}</td>
-                                <td style="border: 1px solid black; padding: 4px; text-align: center; color: ${data.status === 'Active' ? 'green' : 'red'}; font-weight: 600;">${data.status}</td>
+                                <td>1</td>
+                                <td>${data.obligation || 'Income Tax - Resident Individual'}</td>
+                                <td>${data.fromDate || 'N/A'}</td>
+                                <td>${data.tillDate || 'N.A.'}</td>
+                                <td style="color: ${data.status === 'Active' ? 'green' : 'red'}; font-weight: 600;">${data.status}</td>
                             </tr>
                         </tbody>
                     </table>
 
-                    <!-- Footer Text -->
-                    <div style="font-size: 8px; line-height: 1.4; margin-top: 15px;">
+                    <div class="kra-footer-text">
                         The above PIN must appear on all your tax invoices and correspondences with Kenya Revenue Authority. 
                         Your accounting end date is 31st December as per the provisions stated in the Income Tax Act unless 
                         a change has been approved by the Commissioner-Domestic Taxes Department.
                     </div>
 
-                    <!-- Disclaimer -->
-                    <div style="border-top: 1px solid black; padding-top: 8px; margin-top: 15px; font-weight: 700; font-size: 8px;">
+                    <div class="kra-disclaimer">
                         Disclaimer : This is a system generated certificate and does not require signature.
                     </div>
                 </div>
@@ -832,16 +964,20 @@
             
             const element = document.createElement('div');
             element.innerHTML = certHtml;
+            document.body.appendChild(element);
+            
             const filename = data.pin ? `KRA_PIN_Certificate_${data.pin}.pdf` : `KRA_PIN_Certificate_${data.name.replace(/\s+/g, '_')}.pdf`;
             
             html2pdf().set({
                 margin: 0,
                 filename: filename,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true, logging: false },
+                html2canvas: { scale: 2, useCORS: true, logging: false, allowTaint: true },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
                 pagebreak: { mode: 'avoid-all' }
-            }).from(element).save();
+            }).from(element.querySelector('.kra-cert-container')).save().then(() => {
+                document.body.removeChild(element);
+            });
             
             stats.certificates++;
             localStorage.setItem('userStats', JSON.stringify(stats));
