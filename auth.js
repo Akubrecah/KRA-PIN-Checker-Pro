@@ -10,7 +10,7 @@ let currentSubscription = null;
 
 // --- Access Control & Initialization ---
 
-function checkAuthOnLoad() {
+async function checkAuthOnLoad() {
     // CRITICAL FIX: Move modals to body to escape any hidden parent containers
     const authModal = document.getElementById('authModal');
     const pricingModal = document.getElementById('pricingModal');
@@ -22,11 +22,44 @@ function checkAuthOnLoad() {
         document.body.appendChild(pricingModal);
     }
     
+    // 1. Try local storage for immediate UI update (avoids flicker)
     const user = JSON.parse(localStorage.getItem('currentUser'));
     if (user) {
         currentUser = user;
         updateUI(); 
     }
+
+    // 2. Verify with Supabase (Persistent Login)
+    if (window.SupabaseClient) {
+        try {
+            const { data: { session } } = await window.SupabaseClient.auth.getSession();
+            if (session && session.user) {
+                // Determine role (default to previous or 'personal')
+                const role = (currentUser && currentUser.role) ? currentUser.role : 
+                             (session.user.user_metadata.role || 'personal');
+                
+                // Fetch full profile to be sure
+                let profile;
+                try {
+                     profile = await window.SupabaseClient.profile.get(session.user.id);
+                } catch(e) { console.warn("Could not fetch profile on init", e); }
+
+                currentUser = { 
+                    ...session.user, 
+                    role: role,
+                    ...profile
+                };
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                updateUI();
+            } else if (!user) {
+                // No local user and no session -> ensure UI shows logged out
+                updateUI();
+            }
+        } catch (error) {
+            console.error("Session check failed:", error);
+        }
+    }
+
     // Always unhide body after checks are done (if hidden by auth-guard style)
     document.body.style.display = 'block';
 }
