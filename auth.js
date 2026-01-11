@@ -94,7 +94,41 @@ window.closeAuth = function() {
 
 
 // Initialize on Page Load
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // FIRST: Check for OAuth redirect with access_token in URL hash
+    if (window.location.hash && window.location.hash.includes('access_token')) {
+        console.log('[Auth] OAuth redirect detected, parsing token from URL hash...');
+        
+        // Supabase client should automatically detect and handle the hash
+        // But we need to give it a moment to process
+        try {
+            // Get the session that Supabase extracts from the hash
+            const session = await window.SupabaseClient.auth.getSession();
+            if (session && session.user) {
+                console.log('[Auth] Session restored from hash:', session.user.email);
+                
+                // Fetch profile and save
+                try {
+                    const profile = await window.SupabaseClient.profile.get(session.user.id);
+                    currentUser = { ...session.user, ...profile };
+                } catch (e) {
+                    // Profile may not exist for new OAuth users
+                    currentUser = session.user;
+                }
+                
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                
+                // Clean URL hash
+                history.replaceState(null, '', window.location.pathname);
+                
+                updateUI();
+                return; // Skip normal auth check
+            }
+        } catch (err) {
+            console.error('[Auth] Error processing OAuth hash:', err);
+        }
+    }
+    
     checkAuthOnLoad();
     
     // Listen for Auth Changes (e.g. OAuth Redirects)
