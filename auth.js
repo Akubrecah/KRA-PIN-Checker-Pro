@@ -596,3 +596,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }, true);
 });
+
+// Expose Auth Functions Globally
+window.openAuth = openAuth;
+window.closeAuth = closeAuth;
+window.switchAuthMode = switchAuthMode;
+

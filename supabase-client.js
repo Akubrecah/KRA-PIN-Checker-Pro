@@ -60,8 +60,7 @@ async function signIn(email, password) {
 async function signInWithOAuth(provider) {
     // Use production URL to avoid localhost redirect issues
     const productionUrl = 'https://krapro.netlify.app';
-    const currentPath = window.location.pathname || '/index.html';
-    const redirectUrl = productionUrl + currentPath;
+    const redirectUrl = productionUrl + '/dashboard.html';
     
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider: provider,

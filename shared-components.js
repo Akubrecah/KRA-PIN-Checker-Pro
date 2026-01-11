@@ -48,25 +48,15 @@ function createFooter() {
     footer.className = 'fat-footer';
     footer.innerHTML = `
         <div class="footer-content">
-            <div class="footer-cta">
-                <h2>Ready to <br>Get Started?</h2>
-                <a href="javascript:handleGetStarted()" class="footer-btn">Launch App</a>
+            <div class="copyright">
+                &copy; 2026 Akubrecah Technologies.
             </div>
             <div class="footer-links">
-                <div style="display: flex; flex-direction: column; gap: 1rem; text-align: left;">
-                    <strong>Product</strong>
-                    <a href="pricing.html" class="footer-link">Pricing</a>
-                    <a href="about.html" class="footer-link">About</a>
-                </div>
-                <div style="display: flex; flex-direction: column; gap: 1rem; text-align: left;">
-                    <strong>Company</strong>
-                    <a href="about.html" class="footer-link">About Us</a>
-                    <a href="contact.html" class="footer-link">Contact</a>
-                </div>
+                <a href="index.html" class="footer-link">Home</a>
+                <a href="pricing.html" class="footer-link">Pricing</a>
+                <a href="about.html" class="footer-link">About</a>
+                <a href="contact.html" class="footer-link">Contact</a>
             </div>
-        </div>
-        <div class="copyright">
-            &copy; 2026 Akubrecah Technologies.
         </div>
     `;
     return footer;
