@@ -757,120 +757,111 @@
                         height: 297mm;
                         max-height: 297mm;
                         background: white;
-                        padding: 15mm; /* Optimized padding */
+                        padding: 2.0cm; /* Reduced from 2.5cm to ensure single page fit */
                         box-sizing: border-box;
                         font-family: 'Inter', system-ui, -apple-system, sans-serif;
                         color: black;
                         display: flex;
                         flex-direction: column;
                         position: relative;
-                        overflow: hidden;
+                        overflow: hidden; /* Strict overflow hiding */
                     }
                     
                     .kra-cert-header {
                         display: flex;
                         justify-content: space-between;
-                        align-items: center; /* Better alignment */
+                        align-items: flex-start;
                         border-bottom: 2px solid black;
-                        padding-bottom: 10px;
-                        margin-bottom: 15px;
+                        padding-bottom: 10px; /* Reduced padding */
+                        margin-bottom: 15px; /* Reduced margin */
                     }
                     
                     .kra-logo-section {
                         display: flex;
                         align-items: center;
-                        gap: 15px;
+                        gap: 12px;
                     }
                     
                     .kra-logo-section img {
-                        height: 70px; /* Slightly larger logo */
-                        object-fit: contain;
+                        height: 60px;
                     }
                     
                     .kra-text {
                         font-weight: 900;
                         font-size: 16px;
-                        line-height: 1.2;
+                        line-height: 1.1;
                     }
                     
                     .kra-cert-label {
                         background: #e5e7eb;
-                        padding: 8px 30px;
-                        font-weight: 800;
-                        font-size: 18px;
+                        padding: 10px 40px;
+                        font-weight: 900;
+                        font-size: 20px;
                         border: 1px solid #d1d5db;
-                        position: absolute;
-                        left: 50%;
-                        transform: translateX(-50%);
-                        top: 40px; /* Fixed position for header alignment */
                     }
                     
                     .kra-contact-info {
                         text-align: right;
-                        font-size: 8px; /* Compact contact info */
-                        line-height: 1.3;
+                        font-size: 9px;
+                        line-height: 1.4;
                     }
                     
                     .kra-date-pin-section {
                         display: flex;
                         justify-content: flex-end;
-                        margin-bottom: 15px;
+                        margin-bottom: 20px;
                     }
                     
                     .kra-date-pin-box {
                         text-align: right;
-                        line-height: 1.4;
+                        line-height: 1.5;
                     }
                     
                     .kra-cert-date {
-                        font-size: 10px;
+                        font-size: 11px;
                     }
                     
                     .kra-pin-label {
                         font-weight: 700;
-                        font-size: 11px;
+                        font-size: 12px;
                         margin-top: 5px;
                     }
                     
                     .kra-pin-value {
-                        font-weight: 600;
+                        font-weight: 500;
                         font-size: 11px;
                     }
                     
                     .kra-intro-text {
                         text-align: center;
-                        font-size: 10px;
-                        margin-bottom: 15px;
-                        font-style: italic;
+                        font-size: 11px;
+                        margin-bottom: 20px;
                     }
                     
                     .kra-section-title {
                         text-align: center;
                         font-weight: 700;
-                        font-size: 12px;
-                        margin-bottom: 8px;
-                        text-transform: uppercase;
-                        text-decoration: underline;
+                        font-size: 13px;
+                        margin-bottom: 10px;
                     }
                     
                     .kra-cert-table {
                         width: 100%;
                         border-collapse: collapse;
-                        margin-bottom: 15px;
-                        font-size: 10px;
+                        margin-bottom: 20px;
+                        font-size: 11px;
                     }
                     
                     .kra-cert-table th,
                     .kra-cert-table td {
                         border: 1px solid black;
-                        padding: 3px 5px; /* Compact padding */
+                        padding: 3px 6px;
                         text-align: left;
                     }
                     
                     .kra-cert-table .bg-grey {
                         font-weight: 700;
                         width: 30%;
-                        background-color: #f3f4f6; /* Subtle grey background */
                     }
                     
                     .kra-obligation-table th,
@@ -883,23 +874,21 @@
                     
                     .kra-obligation-table thead th {
                         font-weight: 700;
-                        background-color: #f3f4f6;
                     }
                     
                     .kra-footer-text {
-                        font-size: 9px;
+                        font-size: 10px;
                         line-height: 1.4;
                         margin-top: auto;
-                        padding-top: 10px;
-                        text-align: justify;
+                        padding-top: 15px;
                     }
                     
                     .kra-disclaimer {
                         border-top: 1px solid black;
                         padding-top: 5px;
-                        margin-top: 10px;
+                        margin-top: 15px; /* Reduced margin */
                         font-weight: 700;
-                        font-size: 9px;
+                        font-size: 10px;
                     }
                 </style>
                 
