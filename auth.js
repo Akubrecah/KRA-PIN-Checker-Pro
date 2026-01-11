@@ -503,25 +503,38 @@ function logout() {
 }
 
 function updateUI() {
+    // 1. Unified Navigation (Shared)
+    if (window.updateNavigation) {
+        window.updateNavigation(currentUser);
+    }
+
+    // 2. Landing Page Elements
     const toolSection = document.getElementById('tool');
     const userBadge = document.getElementById('userBadge');
     const authBtn = document.getElementById('authBtn');
-    
-    // Check if elements exist before using them
-    if (!authBtn) return; // Basic requirement
-    if (!userBadge && currentUser) return;
 
-    if (currentUser) {
-        if (userBadge) {
-            userBadge.textContent = currentUser.role ? currentUser.role.toUpperCase() : 'USER';
-            userBadge.classList.remove('hidden');
+    if (authBtn) {
+        if (currentUser) {
+            if (userBadge) {
+                userBadge.textContent = currentUser.role ? currentUser.role.toUpperCase() : 'USER';
+                userBadge.classList.remove('hidden');
+            }
+            authBtn.textContent = 'Logout';
+            if (toolSection) toolSection.style.display = 'block';
+        } else {
+            if (userBadge) userBadge.classList.add('hidden');
+            authBtn.textContent = 'Login / Register';
+            if (toolSection) toolSection.style.display = 'none';
         }
-        authBtn.textContent = 'Logout';
-        if (toolSection) toolSection.style.display = 'block';
-    } else {
-        if (userBadge) userBadge.classList.add('hidden');
-        authBtn.textContent = 'Login / Register';
-        if (toolSection) toolSection.style.display = 'none';
+    }
+
+    // 3. Dashboard Elements (if they exist on the page this script runs on)
+    const userNameDisplay = document.getElementById('userName');
+    const creditsDisplay = document.getElementById('creditsLeft');
+    
+    if (currentUser && currentUser.loggedIn) {
+        if (userNameDisplay) userNameDisplay.textContent = currentUser.name || currentUser.email.split('@')[0];
+        if (creditsDisplay) creditsDisplay.textContent = currentUser.credits || 0;
     }
 }
 
@@ -718,3 +731,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// Export functions for module usage
+export { checkAuthOnLoad };

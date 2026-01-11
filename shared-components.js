@@ -146,10 +146,49 @@ function initPage(activePage) {
     if (window.lucide) lucide.createIcons();
 }
 
+// Update header state dynamically
+function updateNavigation(user) {
+    const header = document.querySelector('.site-header');
+    if (!header) return;
+
+    const isLoggedIn = user && user.loggedIn;
+    const userName = isLoggedIn ? (user.name || user.email.split('@')[0]) : null;
+    const homeLink = isLoggedIn ? 'dashboard.html' : 'index.html';
+    const homeText = isLoggedIn ? 'Dashboard' : 'Home';
+
+    // Update Logo Link
+    const logoLink = header.querySelector('.logo a');
+    if (logoLink) logoLink.href = homeLink;
+
+    // Update Home Nav Link
+    const navHome = header.querySelector('.nav-links .nav-link:first-child');
+    if (navHome) {
+        navHome.href = homeLink;
+        navHome.textContent = homeText;
+    }
+
+    // Update Auth Buttons Area
+    const authContainer = header.querySelector('div[style*="align-items: center"]');
+    if (authContainer) {
+        if (isLoggedIn) {
+            authContainer.innerHTML = `
+                <a href="dashboard.html" class="nav-link" style="font-weight:600">${userName}</a>
+                <button class="btn-primary" onclick="window.location.href='dashboard.html'">Dashboard</button>
+            `;
+        } else {
+            authContainer.innerHTML = `
+                 <a href="javascript:void(0)" class="nav-link" onclick="openAuth()">Login</a>
+                 <button class="btn-primary" onclick="openAuth()">Get Started</button>
+            `;
+        }
+    }
+}
+
 // Expose functions globally
 window.handleGetStarted = handleGetStarted;
 window.initPage = initPage;
 window.createAuthModal = createAuthModal;
+window.updateNavigation = updateNavigation;
 
 // Export for module usage
-export { initPage, createAuthModal, handleGetStarted };
+export { initPage, createAuthModal, handleGetStarted, updateNavigation };

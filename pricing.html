@@ -82,11 +82,13 @@
 
     <script type="module">
         import './supabase-client.js';
-        import './auth.js';
+        import { checkAuthOnLoad } from './auth.js';
         import { initPage } from './shared-components.js';
         
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             initPage('pricing');
+            // Check auth to update header
+            await checkAuthOnLoad();
         });
     </script>
 </body>
