@@ -23,10 +23,19 @@
         // to avoid FOUC, then verify with Supabase async.
         
         if (!user) {
-            console.log("No user found. Redirecting to login...");
-            // Redirect to index with a flag to open auth
-            // Use replace to prevent back-button looping
-            window.location.replace('index.html?auth=forced');
+            console.log("No user found in localStorage. Checking Supabase session...");
+            // Instead of immediate redirect, allow a short grace period for Supabase to restore session
+            // if we are on a page that loads supabase-client.js
+            
+            // Set a timeout to redirect if Supabase doesn't verify quickly
+            setTimeout(() => {
+                const userCheck = JSON.parse(localStorage.getItem('currentUser'));
+                if (!userCheck) {
+                     window.location.replace('index.html?auth=forced');
+                } else {
+                     document.body.style.display = 'block';
+                }
+            }, 2000); // 2 second grace period
         } else {
             // User exists, show body if hidden
             document.body.style.display = 'block';
