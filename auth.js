@@ -1,8 +1,8 @@
 // auth.js
 // Supabase Client Initialization
 // TODO: Replace with actual keys from .env or User Input
-const SUPABASE_URL = 'https://PLACEHOLDER_URL.supabase.co';
-const SUPABASE_KEY = 'PLACEHOLDER_KEY';
+const SUPABASE_URL = 'https://sjkodtxkhoukpxfljgit.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_Zjju86j4BqwteaGGBrhv1Q_PdUetgSM';
 
 // State Management
 let currentUser = null;
