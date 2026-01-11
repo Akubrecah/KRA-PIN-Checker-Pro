@@ -531,10 +531,41 @@ function updateUI() {
     // 3. Dashboard Elements (if they exist on the page this script runs on)
     const userNameDisplay = document.getElementById('userName');
     const creditsDisplay = document.getElementById('creditsLeft');
+    const generatorSection = document.getElementById('generatorSection') || document.querySelector('.main-card');
     
     if (currentUser && currentUser.loggedIn) {
         if (userNameDisplay) userNameDisplay.textContent = currentUser.name || currentUser.email.split('@')[0];
-        if (creditsDisplay) creditsDisplay.textContent = currentUser.credits || 0;
+        
+        const credits = currentUser.credits || 0;
+        if (creditsDisplay) {
+            creditsDisplay.textContent = credits;
+            if (credits === 0) {
+                 creditsDisplay.parentElement.classList.add('text-red-600');
+            } else {
+                 creditsDisplay.parentElement.classList.remove('text-red-600');
+            }
+        }
+
+        // Pay-As-You-Go Disabled State Logic
+        if (currentUser.role === 'personal' && credits <= 0 && generatorSection) {
+            if (!generatorSection.querySelector('.limit-overlay')) {
+                generatorSection.classList.add('disabled-state');
+                const overlay = document.createElement('div');
+                overlay.className = 'limit-overlay';
+                overlay.innerHTML = `
+                    <div class="limit-message">
+                        <h3>Out of Credits</h3>
+                        <p>You need credits to continue generating certificates.</p>
+                        <button class="btn-primary" onclick="startPayment('personal')">Top Up Now</button>
+                    </div>
+                `;
+                generatorSection.appendChild(overlay);
+            }
+        } else if (generatorSection) {
+            generatorSection.classList.remove('disabled-state');
+            const existingOverlay = generatorSection.querySelector('.limit-overlay');
+            if (existingOverlay) existingOverlay.remove();
+        }
     }
 }
 
@@ -575,12 +606,13 @@ window.checkAccess = async function() {
         if (currentUser.credits > 0) {
             return true;
         } else {
+            // Should be covered by UI disabled state, but double check
             Swal.fire({
                 title: 'Insufficient Credits',
-                text: "You need 1 credit to perform this check. Cost: 100 KES.",
-                icon: 'warning',
+                text: "You have 0 credits. Please top up to continue.",
+                icon: 'error',
                 showCancelButton: true,
-                confirmButtonText: 'Pay 100 KES',
+                confirmButtonText: 'Top Up',
                 confirmButtonColor: '#10b981'
             }).then((result) => {
                 if (result.isConfirmed) {
