@@ -288,6 +288,152 @@ async function handleAuth(e) {
     }
 }
 
+// --- Dashboard Features ---
+
+window.switchFeature = function(feature) {
+    const generator = document.getElementById('generatorSection');
+    const viewer = document.getElementById('viewerSection');
+    const cardGen = document.getElementById('card-generator');
+    const cardView = document.getElementById('card-viewer');
+    const indGen = document.getElementById('indicator-generator');
+    const indView = document.getElementById('indicator-viewer');
+
+    if (!generator || !viewer) return;
+
+    if (feature === 'generator') {
+        generator.style.display = 'block';
+        viewer.style.display = 'none';
+        
+        cardGen.style.borderColor = 'var(--color-primary)';
+        cardView.style.borderColor = 'var(--color-border)';
+        
+        if(indGen) indGen.style.display = 'block';
+        if(indView) indView.style.display = 'none';
+    } else {
+        generator.style.display = 'none';
+        viewer.style.display = 'block';
+        
+        cardGen.style.borderColor = 'var(--color-border)';
+        cardView.style.borderColor = '#3b82f6';
+        
+        if(indGen) indGen.style.display = 'none';
+        if(indView) indView.style.display = 'block';
+    }
+}
+
+window.handleQuickView = async function() {
+    const pin = document.getElementById('viewerPinInput').value;
+    const resultDiv = document.getElementById('viewerResult');
+    const loadingDiv = document.getElementById('viewerLoading');
+    
+    if (!pin) {
+        Swal.fire('Error', 'Please enter a KRA PIN', 'error');
+        return;
+    }
+
+    if(loadingDiv) loadingDiv.style.display = 'block';
+    if(resultDiv) resultDiv.style.display = 'none';
+
+    try {
+        const details = await window.fetchKraDetails(pin);
+        
+        if(loadingDiv) loadingDiv.style.display = 'none';
+        if(resultDiv) {
+             resultDiv.style.display = 'block';
+             resultDiv.innerHTML = `
+                <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 1.5rem; border-radius: 12px;">
+                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                        <div style="background: #dcfce7; color: #166534; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="check" style="width: 20px;"></i>
+                        </div>
+                        <div>
+                            <h3 style="color: #166534; margin: 0; font-size: 1.1rem;">PIN is Active</h3>
+                            <p style="color: #15803d; font-size: 0.9rem;">${details.name}</p>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; border-top: 1px solid #bbf7d0; padding-top: 1rem;">
+                        <div>
+                            <small style="color: #64748b; display: block; margin-bottom: 0.25rem;">KRA PIN</small>
+                            <span style="font-weight: 600; color: #334155;">${details.pin}</span>
+                        </div>
+                        <div>
+                            <small style="color: #64748b; display: block; margin-bottom: 0.25rem;">Obligation</small>
+                            <span style="font-weight: 600; color: #334155;">${details.taxObligation}</span>
+                        </div>
+                         <div>
+                            <small style="color: #64748b; display: block; margin-bottom: 0.25rem;">Station</small>
+                            <span style="font-weight: 600; color: #334155;">${details.station}</span>
+                        </div>
+                    </div>
+                </div>
+             `;
+             lucide.createIcons();
+        }
+
+    } catch (error) {
+        if(loadingDiv) loadingDiv.style.display = 'none';
+        Swal.fire('Error', error.message || 'Failed to fetch details', 'error');
+    }
+}
+
+// --- Profile Management ---
+window.openProfile = function() {
+    const modal = document.getElementById('profileModal');
+    if (!modal) return;
+    
+    // Populate
+    if (currentUser) {
+       document.getElementById('profileName').value = currentUser.user_metadata?.full_name || currentUser.email.split('@')[0];
+       document.getElementById('profileEmail').value = currentUser.email;
+       document.getElementById('profileAvatarPreview').textContent = (currentUser.user_metadata?.full_name || currentUser.email).charAt(0).toUpperCase();
+    }
+
+    modal.style.display = 'block';
+}
+
+window.closeProfile = function() {
+    document.getElementById('profileModal').style.display = 'none';
+}
+
+window.handleProfileUpdate = async function(e) {
+    e.preventDefault();
+    const name = document.getElementById('profileName').value;
+    const password = document.getElementById('profilePassword').value;
+    const btn = document.getElementById('profileSubmitBtn');
+    
+    btn.textContent = 'Saving...';
+    btn.disabled = true;
+    
+    try {
+        const updates = {
+            data: { full_name: name }
+        };
+        
+        if (password) {
+            updates.password = password;
+        }
+        
+        const { data, error } = await window.SupabaseClient.auth.updateUser(updates);
+        
+        if (error) throw error;
+        
+        // Update local state
+        currentUser = { ...currentUser, ...data.user };
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        updateUI();
+        closeProfile();
+        
+        Swal.fire('Success', 'Profile updated successfully', 'success');
+        
+    } catch (err) {
+        console.error(err);
+        Swal.fire('Error', err.message, 'error');
+    } finally {
+        btn.textContent = 'Save Changes';
+        btn.disabled = false;
+    }
+}
+
 // Global Google Login Handler
 window.googleLogin = async function() {
     console.log("window.googleLogin called");
