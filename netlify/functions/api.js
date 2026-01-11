@@ -76,22 +76,52 @@ router.post('/check-pin', async (req, res) => {
     try {
         const { taxpayerType, taxpayerID } = req.body;
         const config = KRA_CONFIG.pinByID;
+        
+        console.log(`[API] Starting KRA PIN Check for: ${taxpayerID} (${taxpayerType})`);
+        
         const token = await getAccessToken('pinByID');
+        console.log(`[API] Token retrieved (masked): ${token.substring(0, 10)}...`);
 
+        console.log(`[API] Fetching from KRA: ${config.pinCheckerEndpoint}`);
+        
+        const startTime = Date.now();
         const response = await fetch(config.pinCheckerEndpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${token}`,
+                'User-Agent': 'Mozilla/5.0'
             },
             body: JSON.stringify({ TaxpayerType: taxpayerType, TaxpayerID: taxpayerID })
         });
+        
+        console.log(`[API] KRA Response matched in ${Date.now() - startTime}ms`);
+        console.log(`[API] KRA Status: ${response.status} ${response.statusText}`);
 
-        const data = await response.json();
-        if (!response.ok) return res.status(response.status).json(data);
+        const rawText = await response.text();
+        console.log(`[API] Raw KRA Body: ${rawText.substring(0, 500)}`); // Log first 500 chars
+
+        let data;
+        try {
+            data = JSON.parse(rawText);
+        } catch (e) {
+            console.error('[API] Failed to parse JSON from KRA response');
+            return res.status(502).json({ 
+                errorMessage: 'Invalid response from KRA system', 
+                details: rawText.substring(0, 200) 
+            });
+        }
+
+        if (!response.ok) {
+            console.error(`[API] KRA Error: ${JSON.stringify(data)}`);
+            return res.status(response.status).json(data);
+        }
+        
+        console.log('[API] KRA Success');
         res.json(data);
     } catch (error) {
-        res.status(500).json({ errorMessage: error.message });
+        console.error('[API] Fatal Error:', error);
+        res.status(500).json({ errorMessage: error.message, stack: error.stack });
     }
 });
 
