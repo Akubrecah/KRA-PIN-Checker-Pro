@@ -24,7 +24,7 @@ function createHeader(activePage = 'home') {
     header.className = 'site-header';
     header.innerHTML = `
         <nav class="nav-glass">
-            <div class="logo"><a href="${homeLink}">AkubrecaH</a></div>
+            <div class="logo"><a href="${homeLink}"><img src="logo.png" alt="Akubrecah Entertainment" style="height: 40px;"></a></div>
             <div class="nav-links">
                 <a href="${homeLink}" class="nav-link ${activePage === 'home' ? 'active' : ''}">${homeText}</a>
                 <a href="pricing.html" class="nav-link ${activePage === 'pricing' ? 'active' : ''}">Pricing</a>

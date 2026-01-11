@@ -796,20 +796,8 @@
     <script type="module" src="auth.js"></script>
     <script type="module" src="shared-components.js"></script>
     <script type="module">
-        // Inject the new styled auth modal
-        // Wait for window load or ensure shared-components is ready
-        if (window.createAuthModal) {
-             document.body.appendChild(createAuthModal());
-        } else {
-            // Poll for it (since modules are async)
-            const check = setInterval(() => {
-                if (window.createAuthModal) {
-                    clearInterval(check);
-                    document.body.appendChild(createAuthModal());
-                }
-            }, 50);
-        }
-        
+        // Modal already exists in HTML - no injection needed
+        // Just ensure lucide icons are initialized
         if (window.lucide) lucide.createIcons();
     </script>
     <script>

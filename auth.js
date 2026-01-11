@@ -11,6 +11,17 @@ let currentSubscription = null;
 // --- Access Control & Initialization ---
 
 function checkAuthOnLoad() {
+    // CRITICAL FIX: Move modals to body to escape any hidden parent containers
+    const authModal = document.getElementById('authModal');
+    const pricingModal = document.getElementById('pricingModal');
+    
+    if (authModal && authModal.parentElement !== document.body) {
+        document.body.appendChild(authModal);
+    }
+    if (pricingModal && pricingModal.parentElement !== document.body) {
+        document.body.appendChild(pricingModal);
+    }
+    
     const user = JSON.parse(localStorage.getItem('currentUser'));
     if (user) {
         currentUser = user;
