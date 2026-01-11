@@ -25,6 +25,12 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
     </style>
+    <script>
+        // Prevent FOUC: Immediately hide login overlay if token exists
+        if (sessionStorage.getItem('adminToken')) {
+            document.write('<style>#adminLoginOverlay { display: none !important; }</style>');
+        }
+    </script>
 </head>
 <body class="text-gray-900">
 
