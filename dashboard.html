@@ -793,20 +793,166 @@
             showStatus('Official KRA Certificate generated and downloaded!');
         }
         
-        async function toggleUserMenu() {
-            if (confirm('Logout?')) {
-                try {
-                    await window.SupabaseClient.auth.signOut();
-                } catch (e) {
-                    console.error('Logout error:', e);
-                }
-                localStorage.removeItem('currentUser');
-                localStorage.removeItem('currentUser');
-                window.location.href = 'index.html';
+        // --- Profile Modal Functions ---
+        function openProfileModal() {
+            const modal = document.getElementById('profileModal');
+            if (!modal) return;
+            
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            if (!user) return;
+            
+            // Populate fields
+            document.getElementById('profileName').value = user.name || user.full_name || '';
+            document.getElementById('profileEmail').value = user.email || '';
+            document.getElementById('profilePhone').value = user.phone || '';
+            
+            // Set avatar
+            const avatarEl = document.getElementById('profileAvatarImg');
+            if (user.avatar_url) {
+                avatarEl.src = user.avatar_url;
+            } else {
+                avatarEl.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="%237C3AED"/><text x="50" y="65" font-size="40" fill="white" text-anchor="middle">' + (user.name || user.email || 'U').charAt(0).toUpperCase() + '</text></svg>';
+            }
+            
+            modal.style.display = 'flex';
+        }
+        
+        function closeProfileModal() {
+            const modal = document.getElementById('profileModal');
+            if (modal) modal.style.display = 'none';
+        }
+        
+        async function saveProfile() {
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            if (!user || !user.id) return;
+            
+            const newName = document.getElementById('profileName').value.trim();
+            const newPhone = document.getElementById('profilePhone').value.trim();
+            
+            try {
+                Swal.fire({ title: 'Saving...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                
+                await window.SupabaseClient.profile.update(user.id, {
+                    full_name: newName,
+                    name: newName,
+                    phone: newPhone
+                });
+                
+                user.name = newName;
+                user.full_name = newName;
+                user.phone = newPhone;
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                
+                // Update UI
+                document.getElementById('userName').textContent = newName || user.email.split('@')[0];
+                
+                Swal.fire({ icon: 'success', title: 'Profile Updated!', timer: 1500, showConfirmButton: false });
+                closeProfileModal();
+            } catch (e) {
+                console.error('Profile update failed:', e);
+                Swal.fire('Error', 'Failed to update profile: ' + e.message, 'error');
             }
         }
         
+        async function handleAvatarUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            if (!user || !user.id) return;
+            
+            try {
+                Swal.fire({ title: 'Uploading...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                
+                const avatarUrl = await window.SupabaseClient.storage.uploadAvatar(user.id, file);
+                
+                user.avatar_url = avatarUrl;
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                
+                // Update UI
+                document.getElementById('profileAvatarImg').src = avatarUrl;
+                document.getElementById('userAvatar').innerHTML = `<img src="${avatarUrl}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
+                
+                Swal.fire({ icon: 'success', title: 'Avatar Updated!', timer: 1500, showConfirmButton: false });
+            } catch (e) {
+                console.error('Avatar upload failed:', e);
+                Swal.fire('Error', 'Failed to upload avatar: ' + e.message, 'error');
+            }
+        }
+        
+        function handleLogout() {
+            Swal.fire({
+                title: 'Logout?',
+                text: 'Are you sure you want to sign out?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Logout'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        await window.SupabaseClient.auth.signOut();
+                    } catch (e) {
+                        console.error('Logout error:', e);
+                    }
+                    localStorage.removeItem('currentUser');
+                    window.location.href = 'index.html';
+                }
+            });
+        }
+        
+        function toggleUserMenu() {
+            openProfileModal();
+        }
+        
         updatePreview();
+    </script>
+
+    <!-- Profile Modal -->
+    <div id="profileModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
+        <div style="background: white; border-radius: 16px; padding: 2rem; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 style="margin: 0; color: var(--color-text-dark);">Profile Settings</h2>
+                <button onclick="closeProfileModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--color-text);">&times;</button>
+            </div>
+            
+            <!-- Avatar -->
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <div style="position: relative; display: inline-block;">
+                    <img id="profileAvatarImg" src="" alt="Avatar" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--color-primary); cursor: pointer;" onclick="document.getElementById('avatarInput').click()">
+                    <div style="position: absolute; bottom: 0; right: 0; background: var(--color-primary); color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;" onclick="document.getElementById('avatarInput').click()">
+                        <i data-lucide="camera" style="width: 14px;"></i>
+                    </div>
+                </div>
+                <input type="file" id="avatarInput" accept="image/*" style="display: none;" onchange="handleAvatarUpload(event)">
+                <p style="font-size: 0.85rem; color: var(--color-text); margin-top: 0.5rem;">Click to change avatar</p>
+            </div>
+            
+            <!-- Form -->
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--color-text-dark);">Name</label>
+                    <input type="text" id="profileName" placeholder="Your name" style="width: 100%; padding: 12px; border: 1px solid var(--color-border); border-radius: 8px; font-size: 1rem;">
+                </div>
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--color-text-dark);">Email</label>
+                    <input type="email" id="profileEmail" disabled style="width: 100%; padding: 12px; border: 1px solid var(--color-border); border-radius: 8px; font-size: 1rem; background: #f5f5f5; color: #888;">
+                </div>
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--color-text-dark);">Phone</label>
+                    <input type="tel" id="profilePhone" placeholder="+254..." style="width: 100%; padding: 12px; border: 1px solid var(--color-border); border-radius: 8px; font-size: 1rem;">
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                <button class="btn-secondary" onclick="handleLogout()" style="flex: 1;">Logout</button>
+                <button class="btn-primary" onclick="saveProfile()" style="flex: 1;">Save Changes</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Re-init lucide for modal icons
+        if (window.lucide) lucide.createIcons();
     </script>
 </body>
 </html>

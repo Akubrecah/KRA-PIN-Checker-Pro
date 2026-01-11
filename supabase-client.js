@@ -278,6 +278,51 @@ async function getUserTransactions(userId, limit = 50) {
 }
 
 // ============================================
+// AVATAR STORAGE
+// ============================================
+
+async function uploadAvatar(userId, file) {
+    const client = ensureSupabase();
+    if (!client) throw new Error('Supabase client not initialized');
+
+    const fileExt = file.name.split('.').pop();
+    const filePath = `${userId}/avatar.${fileExt}`;
+
+    // Remove old avatar if exists
+    try {
+        await client.storage.from('avatars').remove([`${userId}/avatar.jpg`, `${userId}/avatar.png`, `${userId}/avatar.webp`]);
+    } catch (e) {
+        console.log('No old avatar to remove or removal failed:', e);
+    }
+
+    const { data, error } = await client.storage
+        .from('avatars')
+        .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: true
+        });
+
+    if (error) throw error;
+
+    // Get public URL
+    const { data: urlData } = client.storage.from('avatars').getPublicUrl(filePath);
+    
+    // Update profile with avatar URL
+    await updateUserProfile(userId, { avatar_url: urlData.publicUrl });
+
+    return urlData.publicUrl;
+}
+
+function getAvatarUrl(userId) {
+    const client = ensureSupabase();
+    if (!client) return null;
+    
+    // Return a constructed URL (actual file may vary in extension)
+    const { data } = client.storage.from('avatars').getPublicUrl(`${userId}/avatar.jpg`);
+    return data?.publicUrl || null;
+}
+
+// ============================================
 // EXPORTS (for browser)
 // ============================================
 
@@ -312,6 +357,10 @@ const ClientExport = {
         create: createTransaction,
         updateStatus: updateTransactionStatus,
         getHistory: getUserTransactions
+    },
+    storage: {
+        uploadAvatar,
+        getAvatarUrl
     }
 };
 
