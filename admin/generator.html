@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../favicon.png">
+    <title>Admin Dashboard | AkubrecaH</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script type="module" src="../supabase-client.js"></script>
+    <script type="module" src="../kra_api.js"></script> <!-- Included KRA API Client -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="admin-charts.js" defer></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="text-gray-900">
+
+    <!-- Admin Login Overlay -->
+    <div id="adminLoginOverlay" class="fixed inset-0 bg-gray-900 flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
+            <div class="text-center mb-8">
+                <img src="../logo.png" alt="Akubrecah Entertainment" style="height: 50px; margin: 0 auto 16px;">
+                <h1 class="text-2xl font-bold text-gray-900">Admin Login</h1>
+                <p class="text-gray-500 mt-2">Enter your credentials to access the admin panel</p>
+            </div>
+            <form id="adminLoginForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                    <input type="text" id="adminUsername" required
+                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                        placeholder="Enter username">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input type="password" id="adminPassword" required
+                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                        placeholder="Enter password">
+                </div>
+                <div id="adminLoginError" class="hidden text-red-600 text-sm text-center"></div>
+                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-lg transition">
+                    Login to Admin Panel
+                </button>
+            </form>
+            <div class="mt-6 text-center">
+                <a href="/" class="text-gray-500 hover:text-gray-700 text-sm">← Back to main site</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="fixed inset-y-0 left-0 w-64 bg-gray-900 text-white transition-transform transform -translate-x-full md:translate-x-0 z-30" id="sidebar">
+        <div class="p-6 border-b border-gray-800 flex items-center gap-3">
+            <img src="../logo.png" alt="Akubrecah Entertainment" style="height: 32px;">
+            <span class="font-bold text-xl">Admin</span>
+        </div>
+        <nav class="p-4 space-y-2">
+            <a href="index.html" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-800 rounded-lg text-gray-400 hover:text-white transition">
+                <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
+            </a>
+            <a href="users.html" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-800 rounded-lg text-gray-400 hover:text-white transition">
+                <i data-lucide="users" class="w-5 h-5"></i> Users
+            </a>
+            <a href="transactions.html" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-800 rounded-lg text-gray-400 hover:text-white transition">
+                <i data-lucide="credit-card" class="w-5 h-5"></i> Transactions
+            </a>
+            <a href="logs.html" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-800 rounded-lg text-gray-400 hover:text-white transition">
+                <i data-lucide="file-text" class="w-5 h-5"></i> Audit Logs
+            </a>
+            <a href="generator.html" class="flex items-center gap-3 px-4 py-3 bg-red-700 rounded-lg text-white">
+                <i data-lucide="award" class="w-5 h-5"></i> Generator
+            </a>
+            <div class="border-t border-gray-800 my-4"></div>
+            <a href="/" class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white transition">
+                <i data-lucide="external-link" class="w-5 h-5"></i> Back to App
+            </a>
+            <button onclick="logoutAdmin()" class="flex w-full items-center gap-3 px-4 py-3 text-red-500 hover:text-red-400 transition text-left">
+                <i data-lucide="log-out" class="w-5 h-5"></i> Logout
+            </button>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="md:ml-64 min-h-screen">
+        <!-- Topbar -->
+        <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6 sticky top-0 z-20">
+            <button class="md:hidden p-2" onclick="toggleSidebar()">
+                <i data-lucide="menu" class="w-6 h-6"></i>
+            </button>
+            <h1 class="text-xl font-semibold text-gray-800" id="pageTitle">Certificate Generator</h1>
+            <div class="flex items-center gap-4">
+                <div class="text-right hidden sm:block">
+                    <p class="text-sm font-medium text-gray-900" id="adminName">Admin User</p>
+                    <p class="text-xs text-gray-500">Super Admin</p>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600 font-bold">
+                    A
+                </div>
+            </div>
+        </header>
+
+        <!-- Dynamic Content Sections -->
+        <main class="p-6 space-y-6">
+            
+            <!-- GENERATOR SECTION -->
+            <div id="section-generator" class="space-y-6">
+                <div class="glass-panel p-6 rounded-xl">
+                    <h3 class="font-semibold text-gray-800 mb-4">Generate PIN Certificate</h3>
+                    
+                    <!-- New: Verification Panel -->
+                    <div class="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                        <h4 class="text-sm font-semibold text-gray-700 mb-2">Populate from KRA Database</h4>
+                        <div class="flex gap-2 flex-col md:flex-row">
+                            <select id="verifyType" class="border border-gray-300 rounded-md px-3 py-2 text-sm bg-white focus:outline-none focus:border-red-500">
+                                <option value="PIN">KRA PIN</option>
+                                <option value="National ID">National ID</option>
+                                <option value="Alien ID">Alien ID</option>
+                                <option value="Certificate of Incorporation">Company/Cert of Inc.</option>
+                            </select>
+                            <input type="text" id="verifyInput" class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm" placeholder="Enter PIN or ID Number">
+                            <button id="btnVerify" type="button" class="bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-green-700 transition">
+                                Verify & Autofill
+                            </button>
+                        </div>
+                    </div>
+
+                    <form id="adminCertForm" class="space-y-4 max-w-2xl">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Basic Details -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Taxpayer Name</label>
+                                <input type="text" id="genName" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm uppercase" placeholder="e.g. JOHN DOE" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">KRA PIN</label>
+                                <input type="text" id="genPIN" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm uppercase" placeholder="e.g. A000000000X" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Email Address</label>
+                                <input type="email" id="genEmail" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm uppercase" placeholder="user@example.com" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Effective From</label>
+                                <input type="date" id="genDate" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm" required>
+                            </div>
+
+                            <!-- Address Details -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">L.R. Number</label>
+                                <input type="text" id="genLR" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Building</label>
+                                <input type="text" id="genBuilding" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Street/Road</label>
+                                <input type="text" id="genStreet" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">City/Town</label>
+                                <input type="text" id="genCity" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">County</label>
+                                <select id="genCounty" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm bg-white">
+                                    <option value="">Select County</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">District</label>
+                                <select id="genDistrict" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm bg-white" disabled>
+                                    <option value="">Select County First</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Tax Area</label>
+                                <input type="text" id="genTaxArea" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Station</label>
+                                <input type="text" id="genStation" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm bg-white">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">P.O. Box</label>
+                                <input type="text" id="genBox" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Postal Code</label>
+                                <input list="postalCodes" type="text" id="genPostal" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm" placeholder="Search or Type">
+                                <datalist id="postalCodes"></datalist>
+                            </div>
+
+                            <!-- Obligation Details -->
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700">Tax Obligation</label>
+                                <select id="genObligation" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm bg-white">
+                                    <option value="Income Tax - Resident Individual">Income Tax - Resident Individual</option>
+                                    <option value="Income Tax - Non Resident Individual">Income Tax - Non Resident Individual</option>
+                                    <option value="Income Tax - Company">Income Tax - Company</option>
+                                    <option value="Income Tax - Partnership">Income Tax - Partnership</option>
+                                    <option value="Value Added Tax (VAT)">Value Added Tax (VAT)</option>
+                                    <option value="Pay As You Earn (PAYE)">Pay As You Earn (PAYE)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-span-2 mt-2 pt-4 border-t border-gray-100 flex justify-end">
+                             <button type="submit" id="btnGenerate" class="bg-red-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-red-700 transition w-full md:w-auto flex items-center gap-2">
+                                <i data-lucide="download"></i> Generate & Download PDF
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- High-Fidelity Certificate Template (Hidden) -->
+            <div id="certificate-template" style="display: none;">
+                <style>
+                    /* Injected dynamically during generation, but kept here for structure */
+                    .kra-cert-container {
+                        width: 210mm;
+                        min-height: 297mm;
+                        background: white;
+                        padding: 20mm;
+                        box-sizing: border-box;
+                        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+                        color: black;
+                        display: flex;
+                        flex-direction: column;
+                        position: relative;
+                    }
+                    .kra-cert-header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        border-bottom: 2px solid black;
+                        padding-bottom: 10px;
+                        margin-bottom: 15px;
+                        position: relative;
+                    }
+                    .kra-logo-section { display: flex; align-items: center; gap: 12px; }
+                    .kra-logo-section img { height: 50px; }
+                    .kra-cert-label {
+                        background: #e5e7eb;
+                        padding: 10px 40px;
+                        font-weight: 900;
+                        font-size: 18px;
+                        border: 1px solid #d1d5db;
+                        position: absolute;
+                        left: 50%;
+                        top: 50%;
+                        transform: translate(-50%, -50%);
+                    }
+                    .kra-contact-info { text-align: right; font-size: 9px; line-height: 1.4; }
+                    .kra-date-pin-section { display: flex; justify-content: flex-end; margin-bottom: 20px; }
+                    .kra-date-pin-box { text-align: right; line-height: 1.5; }
+                    .kra-cert-date { font-size: 11px; }
+                    .kra-pin-label { font-weight: 700; font-size: 12px; margin-top: 5px; }
+                    .kra-pin-value { font-weight: 500; font-size: 11px; }
+                    .kra-intro-text { text-align: center; font-size: 11px; margin-bottom: 20px; }
+                    .kra-section-title { text-align: center; font-weight: 700; font-size: 13px; margin-bottom: 10px; }
+                    .kra-cert-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 11px; }
+                    .kra-cert-table th, .kra-cert-table td { border: 1px solid black; padding: 3px 6px; text-align: left; }
+                    .kra-cert-table .bg-grey { font-weight: 700; width: 30%; }
+                    .kra-obligation-table th, .kra-obligation-table td { text-align: center; vertical-align: middle; font-size: 9px; padding: 2px 4px; }
+                    .kra-obligation-table thead th { font-weight: 700; }
+                    .kra-footer-text { font-size: 10px; line-height: 1.5; margin-top: auto; padding-top: 20px; }
+                    .kra-disclaimer { border-top: 1px solid black; padding-top: 5px; margin-top: 30px; font-weight: 700; font-size: 10px; }
+                </style>
+                
+                <div class="kra-cert-container">
+                    <div class="kra-cert-header">
+                        <div class="kra-logo-section">
+                            <img src="../image1.jpeg" alt="KRA Logo">
+                        </div>
+                        <div class="kra-cert-label">PIN Certificate</div>
+                        <div class="kra-contact-info">
+                            <strong>For General Tax Questions<br>Contact KRA Call Centre</strong><br>
+                            Tel: +254 (020) 4999 999<br>
+                            Cell: +254(0711)099 999<br>
+                            Email: callcentre@kra.go.ke
+                        </div>
+                    </div>
+
+                    <div class="kra-date-pin-section">
+                        <div class="kra-date-pin-box">
+                            <div class="kra-cert-date"><strong>Certificate Date :</strong> <span id="certDate"></span></div>
+                            <div class="kra-pin-label">Personal Identification Number</div>
+                            <div class="kra-pin-value" id="certPin"></div>
+                        </div>
+                    </div>
+
+                    <div class="kra-intro-text">
+                        This is to certify that taxpayer shown herein has been registered with Kenya Revenue Authority
+                    </div>
+
+                    <div class="kra-section-title">Taxpayer Information</div>
+                    <table class="kra-cert-table">
+                        <tr><td class="bg-grey">Taxpayer Name</td><td id="certName"></td></tr>
+                        <tr><td class="bg-grey">Email Address</td><td id="certEmail"></td></tr>
+                    </table>
+
+                    <div class="kra-section-title">Registered Address</div>
+                    <table class="kra-cert-table">
+                        <tr><td><strong>L.R. Number :</strong></td><td><strong>Building :</strong></td></tr>
+                        <tr><td><strong>Street/Road :</strong></td><td><strong>City/Town :</strong></td></tr>
+                        <tr><td><strong>County :</strong></td><td><strong>District :</strong></td></tr>
+                        <tr><td><strong>Tax Area :</strong></td><td><strong>Station :</strong></td></tr>
+                        <tr><td><strong>P. O. Box :</strong></td><td><strong>Postal Code :</strong></td></tr>
+                    </table>
+
+                    <div class="kra-section-title">Tax Obligation(s) Registration</div>
+                    <table class="kra-cert-table kra-obligation-table">
+                        <thead>
+                            <tr>
+                                <th>Sr. No.</th>
+                                <th>Tax Obligation(s)</th>
+                                <th>Effective From Date</th>
+                                <th>Effective Till</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>Income Tax - Resident Individual</td>
+                                <td id="certFromDate"></td>
+                                <td>N.A.</td>
+                                <td style="color: green; font-weight: 600;">Active</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="kra-footer-text">
+                        The above PIN must appear on all your tax invoices and correspondences with Kenya Revenue Authority. 
+                        Your accounting end date is 31st December as per the provisions stated in the Income Tax Act unless 
+                        a change has been approved by the Commissioner-Domestic Taxes Department.
+                    </div>
+
+                    <div class="kra-disclaimer">
+                        Disclaimer : This is a system generated certificate and does not require signature.
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        } else {
+            console.warn("Lucide library not loaded.");
+        }
+        
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar) sidebar.classList.toggle('-translate-x-full');
+        }
+    </script>
+    <script type="module" src="../supabase-client.js"></script>
+    <script type="module" src="admin.js"></script>
+    
+    <script>
+        // Admin Authentication
+        const ADMIN_USERNAME = 'Akubrecah';
+        const ADMIN_PASSWORD = 'Akubrecah@254.';
+        
+        // Check if already logged in
+        function checkAdminAuth() {
+            const isAdmin = sessionStorage.getItem('adminLoggedIn');
+            const overlay = document.getElementById('adminLoginOverlay');
+            if (isAdmin === 'true') {
+                overlay.style.display = 'none';
+            } else {
+                overlay.style.display = 'flex';
+            }
+        }
+        
+        // Handle login form
+        document.getElementById('adminLoginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('adminUsername').value;
+            const password = document.getElementById('adminPassword').value;
+            const errorDiv = document.getElementById('adminLoginError');
+            
+            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+                sessionStorage.setItem('adminLoggedIn', 'true');
+                document.getElementById('adminLoginOverlay').style.display = 'none';
+                document.getElementById('adminName').textContent = 'Akubrecah';
+            } else {
+                errorDiv.textContent = 'Invalid username or password';
+                errorDiv.classList.remove('hidden');
+            }
+        });
+        
+        // Logout function
+        function logoutAdmin() {
+            sessionStorage.removeItem('adminLoggedIn');
+            window.location.reload();
+        }
+        
+        // Check auth on page load and restore section
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAdminAuth();
+        });
+    </script>
+</body>
+</html>
