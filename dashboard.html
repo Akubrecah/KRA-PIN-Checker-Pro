@@ -730,23 +730,25 @@
                     
                     .kra-cert-container {
                         width: 210mm;
-                        height: 297mm;
+                        min-height: 297mm;
                         background: white;
-                        padding: 2.5cm;
+                        padding: 20mm; /* Standard A4 margins */
                         box-sizing: border-box;
                         font-family: 'Inter', system-ui, -apple-system, sans-serif;
                         color: black;
                         display: flex;
                         flex-direction: column;
+                        position: relative;
                     }
                     
                     .kra-cert-header {
                         display: flex;
                         justify-content: space-between;
-                        align-items: flex-start;
+                        align-items: center; /* Center aligned */
                         border-bottom: 2px solid black;
-                        padding-bottom: 15px;
-                        margin-bottom: 20px;
+                        padding-bottom: 10px;
+                        margin-bottom: 15px;
+                        position: relative; /* For absolute label positioning */
                     }
                     
                     .kra-logo-section {
@@ -756,32 +758,13 @@
                     }
                     
                     .kra-logo-section img {
-                        height: 60px;
+                        height: 50px; /* Reduced from 60px */
                     }
                     
-                    .kra-cert-header {
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: flex-start;
-                        border-bottom: 2px solid black;
-                        padding-bottom: 15px;
-                        margin-bottom: 20px;
-                        position: relative; /* Added for absolute centering of label */
-                    }
-                    
-                    .kra-logo-section {
-                        display: flex;
-                        align-items: center;
-                        gap: 12px;
-                    }
-                    
-                    .kra-logo-section img {
-                        height: 60px;
-                    }
                     
                     .kra-text {
                         font-weight: 500; /* Removed bold as requested */
-                        font-size: 16px;
+                        font-size: 14px; /* Reduced from 16px */
                         line-height: 1.1;
                     }
                     
@@ -789,7 +772,7 @@
                         background: #e5e7eb;
                         padding: 10px 40px;
                         font-weight: 900;
-                        font-size: 20px;
+                        font-size: 18px;
                         border: 1px solid #d1d5db;
                         position: absolute;
                         left: 50%;
@@ -1001,9 +984,7 @@
                     useCORS: true, 
                     logging: false, 
                     allowTaint: true,
-                    windowWidth: 794,
-                    height: 1123,
-                    windowHeight: 1123
+                    windowWidth: 794
                 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
                 pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
