@@ -259,7 +259,7 @@
         // Check if user exists
         const user = JSON.parse(localStorage.getItem('currentUser'));
         if (!user || !user.loggedIn) {
-            window.location.href = 'signup.html';
+            window.location.href = 'index.html';
         } else if (user.onboarded) {
             window.location.href = 'dashboard.html';
         }
