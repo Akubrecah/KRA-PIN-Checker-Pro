@@ -12,8 +12,10 @@ let supabase = null;
 
 function initSupabase() {
     if (typeof window !== 'undefined' && window.supabase) {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        console.log('Supabase client initialized');
+        if (!supabase) {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log('Supabase client initialized');
+        }
         return supabase;
     } else {
         console.error('Supabase JS library not loaded. Include it in your HTML.');
@@ -21,12 +23,20 @@ function initSupabase() {
     }
 }
 
+function ensureSupabase() {
+    if (!supabase) return initSupabase();
+    return supabase;
+}
+
 // ============================================
 // AUTHENTICATION
 // ============================================
 
 async function signUp(email, password, fullName, role = 'personal') {
-    const { data, error } = await supabase.auth.signUp({
+    const client = ensureSupabase();
+    if (!client) throw new Error('Supabase client failed to initialize');
+
+    const { data, error } = await client.auth.signUp({
         email,
         password,
         options: {
@@ -41,14 +51,17 @@ async function signUp(email, password, fullName, role = 'personal') {
     
     // Update profile with role if signup succeeded
     if (data.user) {
-        await supabase.from('profiles').update({ role }).eq('id', data.user.id);
+        await client.from('profiles').update({ role }).eq('id', data.user.id);
     }
     
     return data;
 }
 
 async function signIn(email, password) {
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const client = ensureSupabase();
+    if (!client) throw new Error('Supabase client failed to initialize');
+
+    const { data, error } = await client.auth.signInWithPassword({
         email,
         password
     });
@@ -58,11 +71,16 @@ async function signIn(email, password) {
 }
 
 async function signInWithOAuth(provider) {
+    const client = ensureSupabase();
+    if (!client) throw new Error('Supabase client failed to initialize');
+
     // Use production URL to avoid localhost redirect issues
     const productionUrl = 'https://krapro.netlify.app';
     const redirectUrl = productionUrl + '/dashboard.html';
     
-    const { data, error } = await supabase.auth.signInWithOAuth({
+    console.log(`Starting OAuth for ${provider} with redirect: ${redirectUrl}`);
+
+    const { data, error } = await client.auth.signInWithOAuth({
         provider: provider,
         options: {
             redirectTo: redirectUrl
