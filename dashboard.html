@@ -586,10 +586,11 @@
     <script>
         lucide.createIcons();
         
-        // Check authentication
+        // Check authentication - redirect to home if not logged in
         const user = JSON.parse(localStorage.getItem('currentUser'));
         if (!user || !user.loggedIn) {
-            window.location.href = 'login.html';
+            // Redirect to home page - auth modal will handle login
+            window.location.href = 'index.html';
         } else if (!user.onboarded) {
             window.location.href = 'onboarding.html';
         }
