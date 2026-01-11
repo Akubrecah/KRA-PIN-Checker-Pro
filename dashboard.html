@@ -11,6 +11,13 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
+        /* Prevent FOUC (Flash of Unauthenticated Content) */
+        body { display: none; }
+    </style>
+    <script src="auth-guard.js"></script>
+    <script type="module" src="supabase-client.js"></script>
+    <script type="module" src="auth.js"></script>
+    <style>
         body {
             background: #F9FAFB;
             font-family: 'Inter', sans-serif;
@@ -1003,7 +1010,8 @@
                     console.error('Logout error:', e);
                 }
                 localStorage.removeItem('currentUser');
-                window.location.href = 'login.html';
+                localStorage.removeItem('currentUser');
+                window.location.href = 'index.html';
             }
         }
         

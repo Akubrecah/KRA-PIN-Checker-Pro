@@ -27,6 +27,8 @@ function checkAuthOnLoad() {
         currentUser = user;
         updateUI(); 
     }
+    // Always unhide body after checks are done (if hidden by auth-guard style)
+    document.body.style.display = 'block';
 }
 
 // Global Auth Functions

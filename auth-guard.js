@@ -3,6 +3,12 @@
 
 (function() {
     function checkAuth() {
+        // ALLOW OAUTH REDIRECTS: If URL has access_token, let the page load (auth.js will handle it)
+        if (window.location.hash && 
+           (window.location.hash.includes('access_token') || window.location.hash.includes('refresh_token'))) {
+            return;
+        }
+
         // 1. Check LocalStorage
         const user = JSON.parse(localStorage.getItem('currentUser'));
         
@@ -15,6 +21,9 @@
             // Redirect to index with a flag to open auth
             // Use replace to prevent back-button looping
             window.location.replace('index.html?auth=forced');
+        } else {
+            // User exists, show body if hidden
+            document.body.style.display = 'block';
         }
     }
 
