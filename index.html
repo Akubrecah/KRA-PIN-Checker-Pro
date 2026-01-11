@@ -231,7 +231,7 @@
     <!-- Navigation -->
     <header class="site-header">
         <nav class="nav-glass">
-            <div class="logo"><a href="index.html">AkubrecaH</a></div>
+            <div class="logo"><a href="index.html"><img src="logo.png" alt="Akubrecah Entertainment" style="height: 40px;"></a></div>
             <div class="nav-links">
                 <a href="index.html" class="nav-link active">Home</a>
                 <a href="pricing.html" class="nav-link">Pricing</a>
@@ -239,8 +239,8 @@
                 <a href="contact.html" class="nav-link">Contact</a>
             </div>
             <div style="display: flex; gap: 12px; align-items: center;">
-                <a href="login.html" class="nav-link" id="loginLink">Login</a>
-                <button class="btn-primary" onclick="handleGetStarted()">Get Started</button>
+                <a href="javascript:void(0)" class="nav-link" id="loginLink" onclick="openAuth()">Login</a>
+                <button class="btn-primary" onclick="openAuth()">Get Started</button>
             </div>
         </nav>
     </header>
