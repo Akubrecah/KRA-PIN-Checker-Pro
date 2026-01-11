@@ -3,9 +3,15 @@
 
 (function() {
     function checkAuth() {
-        // ALLOW OAUTH REDIRECTS: If URL has access_token, let the page load (auth.js will handle it)
+        // ALLOW OAUTH REDIRECTS: 
+        // 1. Hash Fragment (Implicit Flow) - access_token, refresh_token
         if (window.location.hash && 
            (window.location.hash.includes('access_token') || window.location.hash.includes('refresh_token'))) {
+            return;
+        }
+        // 2. Query Params (PKCE Flow) - code
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('code')) {
             return;
         }
 
