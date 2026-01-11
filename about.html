@@ -74,10 +74,11 @@
         </section>
     </main>
 
-    <script type="module" src="supabase-client.js"></script>
-    <script type="module" src="auth.js"></script>
-    <script type="module" src="shared-components.js"></script>
-    <script>
+    <script type="module">
+        import './supabase-client.js';
+        import './auth.js';
+        import { initPage } from './shared-components.js';
+        
         document.addEventListener('DOMContentLoaded', function() {
             initPage('about');
         });

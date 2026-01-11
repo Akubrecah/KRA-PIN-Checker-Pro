@@ -160,3 +160,6 @@ function initPage(activePage) {
 window.handleGetStarted = handleGetStarted;
 window.initPage = initPage;
 window.createAuthModal = createAuthModal;
+
+// Export for module usage
+export { initPage, createAuthModal, handleGetStarted };
