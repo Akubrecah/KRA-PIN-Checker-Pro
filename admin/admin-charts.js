@@ -101,6 +101,9 @@ async function loadUsers() {
     tableBody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">Loading users...</td></tr>';
 
     try {
+        if (!window.SupabaseClient || !window.SupabaseClient.profile) {
+            throw new Error("Supabase Client not initialized. Please refresh.");
+        }
         const users = await window.SupabaseClient.profile.getAll();
         
         if (!users || users.length === 0) {
