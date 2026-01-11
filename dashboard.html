@@ -444,6 +444,65 @@
             <p>Verify KRA PINs and generate professional certificates.</p>
         </section>
 
+        <!-- Feature Selection Cards -->
+        <div class="feature-grid">
+            <div class="stat-card" onclick="switchFeature('generator')" style="cursor: pointer; border: 2px solid var(--color-primary); position: relative; overflow: hidden;" id="card-generator">
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <div class="stat-icon" style="background: rgba(220, 38, 38, 0.1); color: var(--color-primary);">
+                        <i data-lucide="file-check-2"></i>
+                    </div>
+                    <div>
+                        <h3 style="font-weight: 700; margin-bottom: 0.25rem; font-size: 1.1rem;">Generate Certificate</h3>
+                        <p style="font-size: 0.9rem; color: var(--color-text);">Full verification & PDF download</p>
+                    </div>
+                </div>
+                <!-- Active Indicator -->
+                <div id="indicator-generator" style="position: absolute; bottom: 0; left: 0; width: 100%; height: 4px; background: var(--color-primary);"></div>
+            </div>
+
+            <div class="stat-card" onclick="switchFeature('viewer')" style="cursor: pointer; border: 1px solid var(--color-border); position: relative; overflow: hidden;" id="card-viewer">
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <div class="stat-icon" style="background: #eff6ff; color: #3b82f6;">
+                        <i data-lucide="eye"></i>
+                    </div>
+                    <div>
+                        <h3 style="font-weight: 700; margin-bottom: 0.25rem; font-size: 1.1rem;">Quick PIN View</h3>
+                        <p style="font-size: 0.9rem; color: var(--color-text);">View details without generating certificate</p>
+                    </div>
+                </div>
+                 <!-- Active Indicator -->
+                 <div id="indicator-viewer" style="position: absolute; bottom: 0; left: 0; width: 100%; height: 4px; background: #3b82f6; display: none;"></div>
+            </div>
+        </div>
+
+        <!-- VIEWER SECTION (Hidden by default) -->
+        <div id="viewerSection" style="display: none;">
+            <div class="main-card">
+                 <div class="card-header">
+                    <h2><i data-lucide="search" style="width: 20px; display: inline-block; vertical-align: middle; margin-right: 8px;"></i> Quick PIN Lookup</h2>
+                </div>
+                <div class="card-body">
+                    <div class="input-group" style="margin-bottom: 0;">
+                        <div style="display: flex; width: 100%; gap: 1rem;">
+                            <div class="input-wrapper" style="flex: 1; position: relative;">
+                                <i data-lucide="hash" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--color-icon); width: 18px;"></i>
+                                <input type="text" id="viewerPinInput" placeholder="Enter KRA PIN (e.g., A001234567Z)" style="width: 100%; padding-left: 2.8rem; height: 100%;">
+                            </div>
+                            <button class="btn-primary" onclick="handleQuickView()">Search</button>
+                        </div>
+                    </div>
+                     <div id="viewerLoading" style="text-align: center; padding: 2rem; display: none;">
+                        <div class="spinner" style="border: 4px solid #f3f3f3; border-top: 4px solid var(--color-primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+                        <p style="margin-top: 1rem; color: var(--color-text);">Fetching details...</p>
+                    </div>
+                    <div id="viewerResult" style="margin-top: 2rem; display: none;">
+                         <!-- Results injected here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="generatorSection">
         <section class="stats-grid">
             <div class="stat-card">
                 <div class="stat-icon"><i data-lucide="check-circle"></i></div>
@@ -620,6 +679,7 @@
                     </div>
                 </div>
             </div>
+        </div> <!-- End generatorSection -->
         </section>
     </main>
 
