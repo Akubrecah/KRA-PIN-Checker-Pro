@@ -573,28 +573,37 @@ document.getElementById('authForm').addEventListener('submit', handleAuth);
 // We need to attach this safely
 document.addEventListener('DOMContentLoaded', () => {
     // Override the verify buttons to check access first
+    // Override the verify buttons to check access first
     const submitBtnID = document.getElementById('submitBtnID');
-    const originalIDClick = submitBtnID.onclick;
-    
-    // We intercept form submission instead
-    document.getElementById('checkerFormID').addEventListener('submit', (e) => {
-        if (!window.checkAccess()) {
-            e.stopImmediatePropagation();
-            e.preventDefault();
-        } else {
-            // Deduct credit if personal
-             if (currentUser.role === 'personal') currentUser.credits--; 
+    if (submitBtnID) {
+        const originalIDClick = submitBtnID.onclick;
+        
+        // We intercept form submission instead
+        const checkerFormID = document.getElementById('checkerFormID');
+        if (checkerFormID) {
+            checkerFormID.addEventListener('submit', (e) => {
+                if (!window.checkAccess()) {
+                    e.stopImmediatePropagation();
+                    e.preventDefault();
+                } else {
+                    // Deduct credit if personal
+                    if (currentUser && currentUser.role === 'personal') currentUser.credits--; 
+                }
+            }, true); // Capture phase
         }
-    }, true); // Capture phase
+    }
     
-    document.getElementById('checkerFormPIN').addEventListener('submit', (e) => {
-        if (!window.checkAccess()) {
-            e.stopImmediatePropagation();
-            e.preventDefault();
-        } else {
-             if (currentUser.role === 'personal') currentUser.credits--;
-        }
-    }, true);
+    const checkerFormPIN = document.getElementById('checkerFormPIN');
+    if (checkerFormPIN) {
+        checkerFormPIN.addEventListener('submit', (e) => {
+            if (!window.checkAccess()) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+            } else {
+                 if (currentUser && currentUser.role === 'personal') currentUser.credits--;
+            }
+        }, true);
+    }
 });
 
 // Expose Auth Functions Globally
