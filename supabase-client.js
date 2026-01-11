@@ -133,6 +133,17 @@ async function updateUserProfile(userId, updates) {
     return data;
 }
 
+async function getAllProfiles(limit = 100) {
+    const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(limit);
+    
+    if (error) throw error;
+    return data;
+}
+
 // ============================================
 // CREDITS & SUBSCRIPTIONS
 // ============================================
@@ -283,6 +294,7 @@ const ClientExport = {
     },
     profile: {
         get: getUserProfile,
+        getAll: getAllProfiles,
         update: updateUserProfile
     },
     credits: {
