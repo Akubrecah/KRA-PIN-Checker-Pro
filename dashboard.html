@@ -110,7 +110,7 @@
             width: 48px;
             height: 48px;
             border-radius: 12px;
-            background: rgba(124, 58, 237, 0.1);
+            background: rgba(220, 38, 38, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -162,8 +162,8 @@
 
         /* Verification Section */
         .verify-section {
-            background: linear-gradient(135deg, #f8f4ff 0%, #ede7f6 100%);
-            border: 1px solid #e0d4f7;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
             border-radius: 12px;
             padding: 1rem;
             margin-bottom: 1.5rem;
@@ -197,8 +197,8 @@
         }
         
         .btn-verify {
-            background: linear-gradient(135deg, #5FCDB8 0%, #4DB8A5 100%);
-            color: #1F1B3D;
+            background: var(--color-secondary);
+            color: white;
             padding: 10px 20px;
             border: none;
             border-radius: 8px;
@@ -215,7 +215,7 @@
         
         .btn-verify:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(95, 205, 184, 0.3);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
         }
         
         .form-grid {
@@ -258,7 +258,7 @@
         .form-group select:focus {
             outline: none;
             border-color: var(--color-primary);
-            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
         }
         
         .form-section-title {
@@ -296,7 +296,7 @@
         
         .btn-generate:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(124, 58, 237, 0.3);
+            box-shadow: 0 8px 25px rgba(220, 38, 38, 0.3);
         }
         
         .verification-status {
@@ -318,7 +318,7 @@
         /* Certificate Preview */
         .cert-preview {
             background: #fff;
-            border: 2px solid #7C3AED;
+            border: 2px solid var(--color-primary);
             border-radius: 12px;
             padding: 1.5rem;
             height: 100%;
@@ -336,7 +336,7 @@
         }
         
         .cert-header-preview h3 {
-            color: #7C3AED;
+            color: var(--color-primary);
             margin: 0 0 0.25rem 0;
             font-size: 1.1rem;
         }

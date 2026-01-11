@@ -12,7 +12,7 @@
         body {
             min-height: 100vh;
             display: flex;
-            background: linear-gradient(135deg, #3B2D6B 0%, #2D1F5E 100%);
+            background: var(--gradient-primary);
             font-family: 'Inter', sans-serif;
         }
         
@@ -115,8 +115,8 @@
         
         .auth-field input:focus {
             outline: none;
-            border-color: #5FCDB8;
-            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--color-primary);
+            background: rgba(255, 255, 255, 0.2);
         }
         
         .auth-options {
@@ -138,24 +138,24 @@
         .auth-remember input[type="checkbox"] {
             width: 16px;
             height: 16px;
-            accent-color: #5FCDB8;
+            accent-color: var(--color-primary);
         }
         
         .auth-forgot {
-            color: #5FCDB8;
+            color: white;
             font-size: 0.9rem;
-            text-decoration: none;
+            text-decoration: underline;
         }
         
         .btn-auth-primary {
             width: 100%;
             padding: 14px 24px;
-            background: linear-gradient(135deg, #5FCDB8 0%, #4DB8A5 100%);
-            color: #1F1B3D;
+            background: white;
+            color: var(--color-primary);
             border: none;
             border-radius: 10px;
             font-size: 1rem;
-            font-weight: 600;
+            font-weight: 800;
             cursor: pointer;
             transition: all 0.2s;
             font-family: inherit;
@@ -164,7 +164,8 @@
         
         .btn-auth-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(95, 205, 184, 0.3);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            background: #fdfdfd;
         }
         
         .auth-divider {
@@ -216,8 +217,8 @@
         }
         
         .auth-footer a {
-            color: #5FCDB8;
-            text-decoration: none;
+            color: white;
+            text-decoration: underline;
             font-weight: 600;
         }
         
