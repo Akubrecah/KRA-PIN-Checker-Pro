@@ -765,3 +765,32 @@ button[type="submit"]:hover { background: var(--color-primary); }
     background: var(--color-surface);
     border-color: #D1D5DB;
 }
+
+.btn-google {
+    width: 100%;
+    padding: 14px 24px;
+    background: white;
+    color: #1F1B3D;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn-google:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    background: var(--color-surface);
+}
+
+.btn-google svg {
+    width: 20px;
+    height: 20px;
+}

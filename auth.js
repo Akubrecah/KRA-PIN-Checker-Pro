@@ -218,6 +218,38 @@ async function handleAuth(e) {
     });
 }
 
+// Global Google Login Handler
+window.googleLogin = async function() {
+    try {
+        const btn = document.querySelector('.btn-google');
+        let originalContent = '';
+        if (btn) {
+           originalContent = btn.innerHTML;
+           btn.innerHTML = 'Redirecting...';
+           btn.disabled = true;
+        }
+
+        // Use the wrapper we added to supabase-client.js
+        const { data, error } = await window.SupabaseClient.auth.signInWithOAuth('google');
+        
+        if (error) throw error;
+    } catch (error) {
+        console.error('Google Sign-In error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Connection Failed',
+            text: 'Ensure Google OAuth is configured in Supabase Dashboard -> Authentication -> Providers.',
+            footer: '<a href="https://supabase.com/docs/guides/auth/social-login/auth-google" target="_blank">View Configuration Guide</a>'
+        });
+        
+        const btn = document.querySelector('.btn-google');
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = originalContent || 'Log in with Google'; 
+        }
+    }
+}
+
 function logout() {
     currentUser = null;
     updateUI();

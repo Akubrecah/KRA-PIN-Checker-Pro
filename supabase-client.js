@@ -57,6 +57,18 @@ async function signIn(email, password) {
     return data;
 }
 
+async function signInWithOAuth(provider) {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: provider,
+        options: {
+            redirectTo: window.location.origin + '/dashboard.html'
+        }
+    });
+    
+    if (error) throw error;
+    return data;
+}
+
 async function signOut() {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
@@ -243,7 +255,8 @@ const ClientExport = {
         signIn,
         signOut,
         getCurrentUser,
-        getSession
+        getSession,
+        signInWithOAuth
     },
     profile: {
         get: getUserProfile,
