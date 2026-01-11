@@ -522,6 +522,20 @@
             const target = document.getElementById(`section-${sectionId}`);
             if (target) target.classList.remove('hidden');
             
+            // Update URL hash for persistence on refresh
+            window.location.hash = sectionId;
+            
+            // Update sidebar active state
+            document.querySelectorAll('nav a[onclick^="showSection"]').forEach(link => {
+                link.classList.remove('bg-red-700', 'text-white');
+                link.classList.add('text-gray-400', 'hover:bg-gray-800');
+            });
+            const activeLink = document.querySelector(`nav a[onclick="showSection('${sectionId}')"]`);
+            if (activeLink) {
+                activeLink.classList.add('bg-red-700', 'text-white');
+                activeLink.classList.remove('text-gray-400', 'hover:bg-gray-800');
+            }
+            
             const titles = {
                 'dashboard': 'Dashboard Overview',
                 'users': 'User Management',
@@ -531,6 +545,15 @@
             };
             const titleEl = document.getElementById('pageTitle');
             if (titleEl) titleEl.innerText = titles[sectionId] || 'Admin Panel';
+        }
+        
+        // On page load, restore section from URL hash
+        function initSection() {
+            const hash = window.location.hash.replace('#', '');
+            const validSections = ['dashboard', 'users', 'transactions', 'logs', 'generator'];
+            if (hash && validSections.includes(hash)) {
+                showSection(hash);
+            }
         }
     </script>
     <script type="module" src="../supabase-client.js"></script>
@@ -576,8 +599,11 @@
             window.location.reload();
         }
         
-        // Check auth on page load
-        document.addEventListener('DOMContentLoaded', checkAdminAuth);
+        // Check auth on page load and restore section
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAdminAuth();
+            initSection();
+        });
     </script>
 </body>
 </html>
