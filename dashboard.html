@@ -787,17 +787,22 @@
                     }
                     
                     .kra-text {
-                        font-weight: 900;
+                        font-weight: 500; /* Removed bold */
                         font-size: 16px;
                         line-height: 1.1;
                     }
                     
+                    /* Centered Title with Absolute Position */
                     .kra-cert-label {
                         background: #e5e7eb;
                         padding: 10px 40px;
                         font-weight: 900;
                         font-size: 20px;
                         border: 1px solid #d1d5db;
+                        position: absolute;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        top: 2.2cm; /* Specific vertical alignment */
                     }
                     
                     .kra-contact-info {
