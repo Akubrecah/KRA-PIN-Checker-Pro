@@ -26,10 +26,8 @@ function checkAuthOnLoad() {
     if (user) {
         currentUser = user;
         updateUI(); // Call the existing updateUI function
-    } else {
-        // No user found, FORCE LOGIN
-        openAuth(true); // true = force/unclosable
     }
+    // NOTE: Removed forced login popup - users browse freely, login via button clicks
 }
 
 // Explicitly expose openAuth to handle the 'force' parameter
@@ -199,6 +197,7 @@ function switchAuthMode(mode) {
     const submitBtn = document.getElementById('authSubmitBtn');
     const tabLogin = document.getElementById('tabLogin');
     const tabRegister = document.getElementById('tabRegister');
+    const authForm = document.getElementById('authForm');
 
     if (mode === 'register') {
         title.textContent = 'Create Account';
@@ -216,6 +215,9 @@ function switchAuthMode(mode) {
         authForm.dataset.mode = 'login';
     }
 }
+
+// Expose to global scope for HTML onclick attributes
+window.switchAuthMode = switchAuthMode;
 
 async function handleAuth(e) {
     e.preventDefault();
