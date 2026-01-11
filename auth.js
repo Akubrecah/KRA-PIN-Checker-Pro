@@ -99,29 +99,44 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (window.location.hash && window.location.hash.includes('access_token')) {
         console.log('[Auth] OAuth redirect detected, parsing token from URL hash...');
         
-        // Supabase client should automatically detect and handle the hash
-        // But we need to give it a moment to process
+        // IMMEDIATELY clean the hash to prevent loops
+        const cleanPath = window.location.pathname + window.location.search;
+        history.replaceState(null, '', cleanPath);
+        
+        // Give Supabase a moment to process the hash (it does this automatically)
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
         try {
             // Get the session that Supabase extracts from the hash
-            const session = await window.SupabaseClient.auth.getSession();
-            if (session && session.user) {
-                console.log('[Auth] Session restored from hash:', session.user.email);
+            const sessionResult = await window.SupabaseClient.auth.getSession();
+            console.log('[Auth] Session result:', sessionResult);
+            
+            // Session is nested: sessionResult.session.user
+            const session = sessionResult?.session || sessionResult;
+            const user = session?.user;
+            
+            if (user) {
+                console.log('[Auth] User authenticated:', user.email);
                 
-                // Fetch profile and save
+                // Try to fetch profile, create basic user if not found
                 try {
-                    const profile = await window.SupabaseClient.profile.get(session.user.id);
-                    currentUser = { ...session.user, ...profile };
+                    const profile = await window.SupabaseClient.profile.get(user.id);
+                    currentUser = { ...user, ...profile, loggedIn: true };
                 } catch (e) {
-                    // Profile may not exist for new OAuth users
-                    currentUser = session.user;
+                    // Profile may not exist for new OAuth users - create minimal user
+                    console.log('[Auth] No profile found, using basic user data');
+                    currentUser = { 
+                        ...user, 
+                        loggedIn: true,
+                        credits: 0,
+                        role: 'personal'
+                    };
                 }
                 
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                
-                // Clean URL hash
-                history.replaceState(null, '', window.location.pathname);
-                
                 updateUI();
+                
+                console.log('[Auth] OAuth login complete!');
                 return; // Skip normal auth check
             }
         } catch (err) {
