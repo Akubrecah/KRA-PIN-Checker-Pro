@@ -419,11 +419,30 @@
                     document.getElementById('verificationCount').textContent = stats.verifications;
                     
                     showStatus('PIN verified! Edit any field below then generate certificate.');
+
+                    // Log the PIN check
+                    if (currentUser) {
+                        try {
+                            const checkType = pin ? 'PIN' : 'ID';
+                            const checkValue = pin || idNum;
+                            // Note: logPINCheck(userId, pinChecked, idNumber, resultStatus)
+                            await window.SupabaseClient.usage.logCheck(currentUser.id, pin || 'N/A', idNum || 'N/A', 'Success');
+                        } catch(e) { console.error("Log failed", e); }
+                    }
+
                 } else {
                     showStatus('API client not loaded. Please refresh.', true);
                 }
             } catch (error) {
                 console.error('Verification error:', error);
+                
+                // Log failed check
+                if (currentUser) {
+                     try {
+                        await window.SupabaseClient.usage.logCheck(currentUser.id, pin || 'N/A', idNum || 'N/A', 'Failed: ' + error.message);
+                    } catch(e) {}
+                }
+
                 showStatus('Error: ' + error.message, true);
             }
         }
@@ -463,6 +482,26 @@
             if (!data.name) {
                 showStatus('Please enter at least the Taxpayer Name', true);
                 return;
+            }
+
+            // 1. Credit Check (Enforce Limits)
+            if (currentUser && currentUser.role !== 'admin') {
+                if (currentUser.credits <= 0) {
+                     Swal.fire({
+                        icon: 'warning',
+                        title: 'Insufficient Credits',
+                        text: 'You have 0 credits left. Please upgrade your plan or top up to generate more certificates.',
+                        confirmButtonText: 'Get Credits',
+                        showCancelButton: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                             // Correct ID for pricing modal
+                             const pricingModal = document.getElementById('pricingModal');
+                             if(pricingModal) pricingModal.classList.remove('hidden');
+                        }
+                    });
+                    return;
+                }
             }
             
             const today = new Date().toLocaleDateString('en-GB');
@@ -726,8 +765,26 @@
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
                 pagebreak: { mode: 'avoid-all' }
             };
-            html2pdf().set(opt).from(element.querySelector('.kra-cert-container')).save().then(() => {
+            html2pdf().set(opt).from(element.querySelector('.kra-cert-container')).save().then(async () => {
                 document.body.removeChild(element);
+                
+                // 2. Deduct Credit & Log Usage (Backend)
+                if (currentUser) {
+                    try {
+                        if (currentUser.role !== 'admin') {
+                            await window.SupabaseClient.credits.deduct(currentUser.id);
+                            currentUser.credits = Math.max(0, currentUser.credits - 1);
+                            document.getElementById('creditsLeft').textContent = currentUser.credits;
+                            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                        }
+                        
+                        // Log the certificate generation
+                        await window.SupabaseClient.usage.logCertificate(currentUser.id, data.pin);
+
+                    } catch (error) {
+                        console.error("Usage logging failed:", error);
+                    }
+                }
             });
             
             stats.certificates++;
