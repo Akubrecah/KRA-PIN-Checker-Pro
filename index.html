@@ -50,9 +50,29 @@
             const checkInit = setInterval(async () => {
                 if (window.SupabaseClient && window.supabase) {
                     clearInterval(checkInit);
+                    
+                    // Check for session (handles OAuth callback on index page)
                     const session = await window.SupabaseClient.auth.getSession();
-                    if (session) {
-                        window.location.href = 'dashboard.html';
+                    if (session && session.user) {
+                        console.log("Session found on index.html, setting up user...");
+                        try {
+                            // Fetch profile to get role
+                            const profile = await window.SupabaseClient.profile.get(session.user.id);
+                            const currentUser = { 
+                                ...session.user, 
+                                ...profile,
+                                loggedIn: true 
+                            };
+                            
+                            // Save to localStorage so auth-guard.js on dashboard doesn't block us
+                            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                            
+                            window.location.href = 'dashboard.html';
+                        } catch (err) {
+                            console.error("Error setting up user on index:", err);
+                             // Fallback: Just redirect and let dashboard handle it (risk of auth-guard block if config bad)
+                             // But usually profile fetch works.
+                        }
                     }
                 }
             }, 100);
