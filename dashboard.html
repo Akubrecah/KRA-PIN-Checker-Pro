@@ -594,14 +594,11 @@
     <script>
         lucide.createIcons();
         
-        // Check authentication - redirect to home if not logged in
+        // Auth check is handled by auth-guard.js at the top of the page
+        // We do not strictly check here to allow async auth.js to process OAuth hashes
+        
+        // Load user info for UI
         const user = JSON.parse(localStorage.getItem('currentUser'));
-        if (!user || !user.loggedIn) {
-            // Redirect to home page - auth modal will handle login
-            window.location.href = 'index.html';
-        } else if (!user.onboarded) {
-            window.location.href = 'onboarding.html';
-        }
         
         // Update UI with user info
         if (user) {
