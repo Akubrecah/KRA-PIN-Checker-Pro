@@ -146,36 +146,19 @@ async function initAdminDashboard() {
 
     if (!supabase) {
         console.warn("Supabase failed to initialize. Dashboard stats will not load.");
-        // Do NOT return here, continue to setup UI events
+        // Continue anyway - custom admin login handles auth
     } else {
-        // 3. Auth Check (only if supabase exists)
-        const user = await window.SupabaseClient.auth.getCurrentUser();
-        if (!user) {
-            console.warn("No admin session found. Redirecting to login...");
-            window.location.href = '../index.html';
-            return;
+        // Skip Supabase auth check - custom admin login overlay handles authentication
+        // Just load data if admin is logged in via custom login
+        const isAdminLoggedIn = sessionStorage.getItem('adminLoggedIn') === 'true';
+        if (isAdminLoggedIn) {
+            // Update UI with admin name
+            const adminNameEl = document.getElementById('adminName');
+            if (adminNameEl) adminNameEl.innerText = 'Akubrecah';
+            
+            // Load Data
+            loadDashboardData(supabase);
         }
-
-        // 4. Check for Admin Role
-        const { data: profile, error: profError } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', user.id)
-            .single();
-        
-        if (profError || !profile || profile.role !== 'admin') {
-            console.error("Access Denied: Not an admin", profile);
-            showAlert('Access Denied', 'You do not have permission to view this page.', 'error');
-            setTimeout(() => window.location.href = '../index.html', 2000);
-            return;
-        }
-
-        // Update UI
-        const adminNameEl = document.getElementById('adminName');
-        if (adminNameEl) adminNameEl.innerText = user.email;
-        
-        // 5. Load Data
-        loadDashboardData(supabase);
     }
     
     console.log("Admin.js - Initialization Complete.");
