@@ -276,6 +276,8 @@ async function handleAuth(e) {
                 title: 'Welcome Back!',
                 timer: 1500,
                 showConfirmButton: false
+            }).then(() => {
+                window.location.href = 'dashboard.html';
             });
         }
     } catch (error) {
