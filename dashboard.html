@@ -757,7 +757,7 @@
                         height: 297mm;
                         max-height: 297mm;
                         background: white;
-                        padding: 2.0cm; /* Reduced from 2.5cm to ensure single page fit */
+                        padding: 1.8cm; /* Reduced slightly to ensure single page fit & footer visibility */
                         box-sizing: border-box;
                         font-family: 'Inter', system-ui, -apple-system, sans-serif;
                         color: black;
@@ -770,10 +770,10 @@
                     .kra-cert-header {
                         display: flex;
                         justify-content: space-between;
-                        align-items: flex-start;
+                        align-items: center; /* Fixed alignment */
                         border-bottom: 2px solid black;
-                        padding-bottom: 10px; /* Reduced padding */
-                        margin-bottom: 15px; /* Reduced margin */
+                        padding-bottom: 10px;
+                        margin-bottom: 15px;
                     }
                     
                     .kra-logo-section {
