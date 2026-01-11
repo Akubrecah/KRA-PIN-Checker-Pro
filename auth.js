@@ -280,15 +280,13 @@ async function handleAuth(e) {
         let authResult;
         
         if (mode === 'register') {
-            authResult = await window.SupabaseClient.auth.signUp(email, password, { 
-                role: role,
-                full_name: email.split('@')[0]
-            });
+            const fullName = email.split('@')[0];
+            authResult = await window.SupabaseClient.auth.signUp(email, password, fullName, role);
             if (authResult.error) throw authResult.error;
             Swal.fire({
                 icon: 'success',
                 title: 'Registration Successful',
-                text: 'Please check your email to confirm your account.',
+                text: 'Please check your email (including spam) to confirm. If no email arrives, check Supabase SMTP settings.',
             });
         } else {
             authResult = await window.SupabaseClient.auth.signIn(email, password);
