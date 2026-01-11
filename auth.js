@@ -293,6 +293,7 @@ async function handleAuth(e) {
 
 // Global Google Login Handler
 window.googleLogin = async function() {
+    console.log("window.googleLogin called");
     try {
         const btn = document.querySelector('.btn-google');
         let originalContent = '';
