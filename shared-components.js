@@ -33,10 +33,11 @@ function createHeader(activePage = 'home') {
             </div>
             <div style="display: flex; gap: 12px; align-items: center;">
                 ${isLoggedIn 
-                    ? `<a href="dashboard.html" class="nav-link">${userName}</a>`
-                    : `<a href="javascript:void(0)" class="nav-link" onclick="openAuth()">Login</a>`
+                    ? `<a href="dashboard.html" class="nav-link" style="font-weight: 600;">${userName}</a>
+                       <button class="btn-primary" onclick="window.location.href='dashboard.html'">Dashboard</button>`
+                    : `<a href="javascript:void(0)" class="nav-link" onclick="openAuth()">Login</a>
+                       <button class="btn-primary" onclick="openAuth()">Get Started</button>`
                 }
-                <button class="btn-primary" onclick="openAuth()">Get Started</button>
             </div>
         </nav>
     `;
