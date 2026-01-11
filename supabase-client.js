@@ -256,7 +256,8 @@ const ClientExport = {
         signOut,
         getCurrentUser,
         getSession,
-        signInWithOAuth
+        signInWithOAuth,
+        onAuthStateChange: (callback) => supabase.auth.onAuthStateChange(callback)
     },
     profile: {
         get: getUserProfile,

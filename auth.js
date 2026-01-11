@@ -88,6 +88,30 @@ window.closeAuth = function() {
 document.addEventListener('DOMContentLoaded', () => {
     checkAuthOnLoad();
     
+    // Listen for Auth Changes (e.g. OAuth Redirects)
+    if (window.SupabaseClient && window.SupabaseClient.auth.onAuthStateChange) {
+        window.SupabaseClient.auth.onAuthStateChange(async (event, session) => {
+            console.log("Auth State Change:", event);
+            if (event === 'SIGNED_IN' && session) {
+                // Only act if we don't have current user or it's a fresh login
+                // Fetch full profile to ensure we have credits/role
+                try {
+                     const profile = await window.SupabaseClient.profile.get(session.user.id);
+                     currentUser = { ...session.user, ...profile };
+                     localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                     updateUI();
+                     closeAuth(); // Close modal if open
+                } catch (err) {
+                    console.error("Error fetching profile on auth change:", err);
+                }
+            } else if (event === 'SIGNED_OUT') {
+                currentUser = null;
+                localStorage.removeItem('currentUser');
+                updateUI();
+            }
+        });
+    }
+
     // Check for cert generation gating
     const generateBtn = document.getElementById('generateCertBtn');
     if (generateBtn) {
@@ -185,37 +209,71 @@ function switchAuthMode(mode) {
 async function handleAuth(e) {
     e.preventDefault();
     const email = document.getElementById('authEmail').value;
+    const password = document.getElementById('authPassword').value; // Need to ensure this input exists
     const mode = document.getElementById('authForm').dataset.mode;
     const role = document.getElementById('authRole').value;
+    const submitBtn = document.getElementById('authSubmitBtn');
+    
+    // Set loading state
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Processing...';
+    submitBtn.disabled = true;
 
-    // Simulation for Demo (Replace with Supabase Logic)
-    Swal.fire({
-        title: 'Authenticating...',
-        timer: 1000,
-        didOpen: () => Swal.showLoading()
-    }).then(() => {
-        // Mock Success
-        currentUser = {
-            email: email,
-            role: mode === 'register' ? role : 'personal', // Default to personal for login mock
-            credits: 0
-        };
+    try {
+        let authResult;
         
-        updateUI();
-        closeAuth();
-        
-        if (mode === 'register' && role === 'cyber') {
-            openPricing(); // Prompt payment immediately for Cyber
+        if (mode === 'register') {
+            // 1. Sign Up
+            authResult = await window.SupabaseClient.auth.signUp(email, password, { 
+                role: role,
+                full_name: email.split('@')[0] // Default name
+            });
+            
+            if (authResult.error) throw authResult.error;
+            
+            Swal.fire({
+                icon: 'success',
+                title: 'Registration Successful',
+                text: 'Please check your email to confirm your account.',
+            });
+            
+        } else {
+            // 2. Sign In
+            authResult = await window.SupabaseClient.auth.signIn(email, password);
+             if (authResult.error) throw authResult.error;
+             
+             // Fetch Profile Data (credits, role, etc)
+             const profile = await window.SupabaseClient.profile.get(authResult.user.id);
+             
+             currentUser = {
+                 ...authResult.user,
+                 ...profile // Merge profile data (role, credits, etc)
+             };
+             
+             // Persist to localStorage for checkAuthOnLoad
+             localStorage.setItem('currentUser', JSON.stringify(currentUser));
+             
+             updateUI();
+             closeAuth();
+             
+             Swal.fire({
+                icon: 'success',
+                title: 'Welcome Back!',
+                timer: 1500,
+                showConfirmButton: false
+            });
         }
-        
+    } catch (error) {
+        console.error("Auth Error:", error);
         Swal.fire({
-            icon: 'success',
-            title: 'Success!',
-            text: `Logged in as ${currentUser.role.toUpperCase()} User`,
-            timer: 1500,
-            showConfirmButton: false
+            icon: 'error',
+            title: 'Authentication Failed',
+            text: error.message
         });
-    });
+    } finally {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    }
 }
 
 // Global Google Login Handler
@@ -233,6 +291,10 @@ window.googleLogin = async function() {
         const { data, error } = await window.SupabaseClient.auth.signInWithOAuth('google');
         
         if (error) throw error;
+        
+        // Note: OAuth redirect happens here, so code below might not run immediately.
+        // But if it's a pop-up or handling redirect result:
+        // Supabase usually redirects. On return (checkAuthOnLoad), we need to handle session restoration.
     } catch (error) {
         console.error('Google Sign-In error:', error);
         Swal.fire({
@@ -440,10 +502,7 @@ function pollPaymentStatus(checkoutRequestID) {
     }, 3000);
 }
 
-// Deprecated Mock Process Function
-function processPayment(amount) {
-    console.warn("processPayment is deprecated. Use startPayment.");
-}
+// Deprecated Mock Process Function removed
 
 // Event Listeners
 document.getElementById('authForm').addEventListener('submit', handleAuth);
