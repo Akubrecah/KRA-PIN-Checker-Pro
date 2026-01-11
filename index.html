@@ -37,8 +37,25 @@
         }
         
         // Update login link based on user state
-        window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Check for potential session even before waiting for full init
             const user = JSON.parse(localStorage.getItem('currentUser'));
+            if (user && user.loggedIn) {
+               // Optional: redirect immediately if local storage says logged in, 
+               // but verifying with Supabase is safer.
+               // For now, let's rely on Supabase init to confirm valid session.
+            }
+
+            const checkInit = setInterval(async () => {
+                if (window.SupabaseClient && window.supabase) {
+                    clearInterval(checkInit);
+                    const session = await window.SupabaseClient.auth.getSession();
+                    if (session) {
+                        window.location.href = 'dashboard.html';
+                    }
+                }
+            }, 100);
+
             const loginLink = document.getElementById('loginLink');
             
             if (user && user.loggedIn && loginLink) {

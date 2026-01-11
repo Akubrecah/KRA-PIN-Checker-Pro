@@ -17,13 +17,16 @@ function createHeader(activePage = 'home') {
     const isLoggedIn = user && user.loggedIn;
     const userName = isLoggedIn ? (user.name || user.email.split('@')[0]) : null;
     
+    const homeLink = isLoggedIn ? 'dashboard.html' : 'index.html';
+    const homeText = isLoggedIn ? 'Dashboard' : 'Home';
+    
     const header = document.createElement('header');
     header.className = 'site-header';
     header.innerHTML = `
         <nav class="nav-glass">
-            <div class="logo"><a href="index.html">AkubrecaH</a></div>
+            <div class="logo"><a href="${homeLink}">AkubrecaH</a></div>
             <div class="nav-links">
-                <a href="index.html" class="nav-link ${activePage === 'home' ? 'active' : ''}">Home</a>
+                <a href="${homeLink}" class="nav-link ${activePage === 'home' ? 'active' : ''}">${homeText}</a>
                 <a href="pricing.html" class="nav-link ${activePage === 'pricing' ? 'active' : ''}">Pricing</a>
                 <a href="about.html" class="nav-link ${activePage === 'about' ? 'active' : ''}">About</a>
                 <a href="contact.html" class="nav-link ${activePage === 'contact' ? 'active' : ''}">Contact</a>

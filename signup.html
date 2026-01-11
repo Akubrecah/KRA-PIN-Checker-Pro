@@ -278,41 +278,57 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client.js"></script>
     <script>
         lucide.createIcons();
         
-        // Check if already logged in
-        const user = JSON.parse(localStorage.getItem('currentUser'));
-        if (user && user.onboarded) {
-            window.location.href = 'dashboard.html';
-        }
+        // Check session on load
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Wait for Supabase init
+            const checkInit = setInterval(async () => {
+                if (window.SupabaseClient && window.supabase) {
+                    clearInterval(checkInit);
+                    const session = await window.SupabaseClient.auth.getSession();
+                    if (session) {
+                        window.location.href = 'dashboard.html';
+                    }
+                }
+            }, 100);
+        });
         
-        document.getElementById('signupForm').addEventListener('submit', function(e) {
+        document.getElementById('signupForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            const btn = this.querySelector('button[type="submit"]');
+            const originalText = btn.textContent;
             
-            // Create user and go to onboarding
-            const userData = {
-                email: email,
-                role: 'personal',
-                loggedIn: true,
-                onboarded: false
-            };
-            localStorage.setItem('currentUser', JSON.stringify(userData));
-            window.location.href = 'onboarding.html';
+            try {
+                btn.disabled = true;
+                btn.textContent = 'Creating Account...';
+                
+                // Sign up with Supabase
+                const { data, error } = await window.SupabaseClient.auth.signUp(email, password);
+                
+                if (error) throw error;
+                
+                // Success - save generic profile data if needed, or just let dashboard handle it
+                if (data.user) {
+                     alert('Account created! Please check your email for verification link if enabled, or sign in.');
+                     // Auto login usually happens depending on config, but safe to send to login
+                     window.location.href = 'login.html';
+                }
+            } catch (error) {
+                console.error('Signup error:', error);
+                alert('Signup Failed: ' + error.message);
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
         });
         
         function googleSignUp() {
-            // Simulate Google sign-up
-            const userData = {
-                email: 'user@gmail.com',
-                role: 'personal',
-                loggedIn: true,
-                onboarded: false
-            };
-            localStorage.setItem('currentUser', JSON.stringify(userData));
-            window.location.href = 'onboarding.html';
+            alert('Google Sign-Up not yet configured with Supabase keys.');
         }
     </script>
 </body>

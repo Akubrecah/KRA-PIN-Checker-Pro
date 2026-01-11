@@ -384,7 +384,7 @@
 </head>
 <body>
     <header class="dashboard-header">
-        <div class="logo"><a href="index.html">AkubrecaH</a></div>
+        <div class="logo"><a href="dashboard.html">AkubrecaH</a></div>
         <nav class="dashboard-nav">
             <a href="dashboard.html" class="active">Dashboard</a>
             <a href="pricing.html">Pricing</a>
@@ -876,7 +876,6 @@
                     <div class="kra-cert-header">
                         <div class="kra-logo-section">
                             <img src="image1.jpeg" alt="KRA Logo">
-                            <div class="kra-text">KENYA REVENUE<br>AUTHORITY</div>
                         </div>
                         <div class="kra-cert-label">PIN Certificate</div>
                         <div class="kra-contact-info">
@@ -993,10 +992,15 @@
             showStatus('Official KRA Certificate generated and downloaded!');
         }
         
-        function toggleUserMenu() {
+        async function toggleUserMenu() {
             if (confirm('Logout?')) {
+                try {
+                    await window.SupabaseClient.auth.signOut();
+                } catch (e) {
+                    console.error('Logout error:', e);
+                }
                 localStorage.removeItem('currentUser');
-                window.location.href = 'index.html';
+                window.location.href = 'login.html';
             }
         }
         

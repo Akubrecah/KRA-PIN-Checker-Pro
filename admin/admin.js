@@ -1,76 +1,229 @@
 // admin.js - Admin Dashboard Logic
-
 console.log("Admin.js loading...");
 
-/**
- * Verify Data (PIN or ID) and Autofill Form
- */
-window.verifyAdminData = async () => {
-    console.log("verifyAdminData called");
-    
-    // Safety check for KRA Client
-    if (!window.kraClient) {
-        console.error("KRA Client not loaded");
-        Swal.fire('System Error', 'KRA Client library missing. Try refreshing.', 'error');
-        return;
+// Helper for Alerts (Robust against missing SweetAlert)
+function showAlert(title, text, icon) {
+    if (typeof Swal !== 'undefined') {
+        Swal.fire(title, text, icon);
+    } else {
+        alert(`${title}: ${text}`);
     }
+}
 
-    const type = document.getElementById('verifyType').value;
-    const inputField = document.getElementById('verifyInput');
-    const value = inputField.value.trim();
-    const btn = document.getElementById('btnVerify');
+// 1. Verification Logic
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("Initializing Admin Verification...");
+    const btnVerify = document.getElementById('btnVerify');
     
-    console.log(`Verifying: ${type} - ${value}`);
+    if (btnVerify) {
+        btnVerify.addEventListener('click', async (e) => {
+            e.preventDefault(); 
+             console.log("Verify Button Clicked");
+             
+             // Check if KRA Client is available
+             const client = window.kraClient || { 
+                 checkPIN: typeof checkPIN !== 'undefined' ? checkPIN : null,
+                 checkPINByPIN: typeof checkPINByPIN !== 'undefined' ? checkPINByPIN : null 
+             };
 
-    if (!value) {
-        Swal.fire('Error', 'Please enter a value to verify', 'error');
-        return;
-    }
-
-    const originalText = btn.textContent;
-    btn.textContent = 'Verifying...';
-    btn.disabled = true;
-
-    try {
-        let result;
-        if (type === 'PIN') {
-            result = await window.kraClient.checkPINByPIN(value);
-        } else {
-            result = await window.kraClient.checkPIN(type, value);
-        }
+            if (!client.checkPIN && !client.checkPINByPIN) {
+                showAlert('System Error', 'KRA Client library not ready. Please refresh.', 'error');
+                return;
+            }
         
-        console.log("Verification Result:", result);
+            const type = document.getElementById('verifyType').value;
+            const inputField = document.getElementById('verifyInput');
+            const value = inputField.value.trim();
+        
+            if (!value) {
+                showAlert('Error', 'Please enter a value to verify', 'error');
+                return;
+            }
+        
+            const originalText = btnVerify.innerHTML;
+            btnVerify.innerHTML = 'Verifying...';
+            btnVerify.disabled = true;
+        
+            try {
+                let result;
+                if (type === 'PIN') {
+                    if (client.checkPINByPIN) {
+                         result = await client.checkPINByPIN(value);
+                    } else { throw new Error("checkPINByPIN function missing"); }
+                } else {
+                    if (client.checkPIN) {
+                        result = await client.checkPIN(type, value);
+                    } else { throw new Error("checkPIN function missing"); }
+                }
+                
+                console.log("Verification Result:", result);
+        
+                if (result && (result.TaxpayerName || result.Name)) {
+                    // Auto-fill
+                    const tName = result.TaxpayerName || result.Name;
+                    const tPIN = result.TaxpayerPIN || result.KRAPIN || value;
+                    
+                    document.getElementById('genName').value = tName;
+                    document.getElementById('genPIN').value = tPIN;
+                    
+                    // Set date to today
+                    const today = new Date().toISOString().split('T')[0];
+                    document.getElementById('genDate').value = today;
 
-        if (result && result.TaxpayerName) {
-            // Auto-fill
-            document.getElementById('genName').value = result.TaxpayerName;
-            document.getElementById('genPIN').value = result.TaxpayerPIN || value; // Fallback if PIN not in response
-            
-            // Set date to today
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('genDate').value = today;
-
-            Swal.fire({
-                icon: 'success',
-                title: 'Verified & Found',
-                text: `Loaded details for ${result.TaxpayerName}`,
-                timer: 1500,
-                showConfirmButton: false
-            });
-        } else {
-             throw new Error("Invalid response structure or no record found");
-        }
-    } catch (e) {
-        console.error("Verification Error:", e);
-        let msg = e.message || 'Could not find taxpayer details';
-        if (msg.includes('fetch failed')) msg = "Connection Error. Ensure server is running.";
-        Swal.fire('Verification Failed', msg, 'error');
-    } finally {
-        btn.textContent = originalText;
-        btn.disabled = false;
+                    showAlert('Verified & Found', `Loaded details for ${tName}`, 'success');
+                } else {
+                     throw new Error("Invalid response structure or no record found");
+                }
+            } catch (e) {
+                console.error("Verification Error:", e);
+                let msg = e.message || 'Could not find taxpayer details';
+                if (msg.includes('fetch failed')) msg = "Connection Error. Ensure server is running.";
+                showAlert('Verification Failed', msg, 'error');
+            } finally {
+                btnVerify.innerHTML = originalText;
+                btnVerify.disabled = false;
+            }
+        });
     }
-};
+});
 
+// 2. Generator Logic
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("Initializing Admin Generator...");
+    const certForm = document.getElementById('adminCertForm');
+    
+    if (certForm) {
+        certForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            console.log("Generate Submitted");
+            
+            const btn = document.getElementById('btnGenerate');
+            const submitBtn = btn || e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            
+            // Get Values
+            const getValue = (id) => {
+                const el = document.getElementById(id);
+                return el ? el.value : '';
+            };
+
+            const name = getValue('genName');
+            const pin = getValue('genPIN');
+            const email = getValue('genEmail');
+            const date = getValue('genDate');
+            
+            // Address Extras
+            const lr = getValue('genLR');
+            const building = getValue('genBuilding');
+            const street = getValue('genStreet');
+            const city = getValue('genCity');
+            const county = getValue('genCounty');
+            const district = getValue('genDistrict');
+            const taxArea = getValue('genTaxArea');
+            const station = getValue('genStation');
+            const box = getValue('genBox');
+            const postal = getValue('genPostal');
+            const obligation = getValue('genObligation');
+
+            if (!name || !pin || !date) {
+                showAlert('Error', 'Please fill at least Name, PIN and Date', 'error');
+                return;
+            }
+            
+            try {
+                submitBtn.innerHTML = 'Generating PDF...';
+                submitBtn.disabled = true;
+
+                // Populate Template (Using CORRECT IDs matching admin/index.html)
+                const setContent = (id, val) => {
+                    const el = document.getElementById(id);
+                    if(el) el.textContent = val;
+                };
+
+                // CamelCase IDs for high-fidelity template
+                setContent('certName', name.toUpperCase());
+                setContent('certPin', pin.toUpperCase());
+                setContent('certDate', new Date().toLocaleDateString('en-GB'));
+                setContent('certFromDate', new Date(date).toLocaleDateString('en-GB'));
+                setContent('certEmail', email || 'N/A');
+                
+                // Populate Address Tables
+                const certTable = document.querySelectorAll('.kra-cert-table')[1]; 
+                if(certTable) {
+                    const setRow = (r, c, label, val) => {
+                        if(certTable.rows[r] && certTable.rows[r].cells[c]) {
+                            certTable.rows[r].cells[c].innerHTML = `<strong>${label} :</strong> ${val}`;
+                        }
+                    };
+                    setRow(0, 0, 'L.R. Number', lr);
+                    setRow(0, 1, 'Building', building);
+                    setRow(1, 0, 'Street/Road', street);
+                    setRow(1, 1, 'City/Town', city);
+                    setRow(2, 0, 'County', county);
+                    setRow(2, 1, 'District', district);
+                    setRow(3, 0, 'Tax Area', taxArea);
+                    setRow(3, 1, 'Station', station);
+                    setRow(4, 0, 'P. O. Box', box);
+                    setRow(4, 1, 'Postal Code', postal);
+                }
+                
+                // Populate Obligation
+                const obTable = document.querySelector('.kra-obligation-table tbody');
+                if(obTable && obTable.rows[0]) {
+                    obTable.rows[0].cells[1].textContent = obligation;
+                    obTable.rows[0].cells[2].textContent = new Date(date).toLocaleDateString('en-GB');
+                }
+                
+                // Generate PDF
+                const element = document.getElementById('certificate-template');
+                element.style.display = 'block'; 
+
+                const filename = `KRA_PIN_Certificate_${pin.toUpperCase()}.pdf`;
+                const opt = {
+                    margin: 0,
+                    filename: filename,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true, logging: false, allowTaint: true, scrollY: 0 },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                    pagebreak: { mode: 'avoid-all' }
+                };
+                
+                if (typeof html2pdf === 'undefined') {
+                    throw new Error("html2pdf library is missing!");
+                }
+
+                await html2pdf().set(opt).from(element.querySelector('.kra-cert-container')).save();
+                element.style.display = 'none';
+
+                // Log Usage
+                if (typeof window.supabase !== 'undefined' && window.supabase) {
+                    const user = await window.SupabaseClient.auth.getCurrentUser();
+                    if (user) {
+                        await window.supabase.from('usage_logs').insert([{
+                            user_id: user.id,
+                            activity_type: 'admin_certificate_generated',
+                            target_pin: pin,
+                            certificate_generated: true
+                        }]);
+                    }
+                }
+
+                showAlert('Certificate Generated', `PDF for ${pin} has been downloaded.`, 'success');
+
+            } catch (err) {
+                console.error("Generation Error:", err);
+                showAlert('Generation Failed', err.message, 'error');
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+    } else {
+         console.error("adminCertForm not found");
+    }
+});
+
+// 3. Admin Auth & Dashboard Logic (Supabase)
 window.logoutAdmin = async () => {
     if (window.SupabaseClient) {
         await window.SupabaseClient.auth.signOut();
@@ -81,12 +234,18 @@ window.logoutAdmin = async () => {
 // Initialize Supabase
 const supabase = window.SupabaseClient ? window.SupabaseClient.init() : null;
 
+// Start logic (Auth Check)
+document.addEventListener('DOMContentLoaded', () => {
+    if (supabase) {
+        checkAdminAuth();
+    } else {
+        console.warn("Supabase not initialized (Auth Check)");
+    }
+});
+
 // Check if user is admin
 async function checkAdminAuth() {
-    if (!supabase) {
-        console.warn("Supabase not init in checkAdminAuth");
-        return; // Or handle error
-    }
+    if (!supabase) return;
 
     const user = await window.SupabaseClient.auth.getCurrentUser();
     if (!user) {
@@ -101,13 +260,8 @@ async function checkAdminAuth() {
         .single();
     
     if (!profile || profile.role !== 'admin') {
-        Swal.fire({
-            icon: 'error',
-            title: 'Access Denied',
-            text: 'You do not have permission to view this page.'
-        }).then(() => {
-            window.location.href = '../index.html';
-        });
+        showAlert('Access Denied', 'You do not have permission to view this page.', 'error');
+        setTimeout(() => window.location.href = '../index.html', 2000);
         return;
     }
     
@@ -277,103 +431,37 @@ async function loadAuditLogs() {
 
 // Admin Actions
 window.addCreditsPrompt = async (userId) => {
-    const { value: credits } = await Swal.fire({
-        title: 'Add Credits',
-        input: 'number',
-        inputLabel: 'Amount of credits to add',
-        inputPlaceholder: 'e.g. 50',
-        showCancelButton: true
-    });
-
-    if (credits) {
-        const { error } = await supabase.rpc('add_credits', {
-            user_id: userId,
-            credit_amount: parseInt(credits)
+    if (typeof Swal !== 'undefined') {
+        const { value: credits } = await Swal.fire({
+            title: 'Add Credits',
+            input: 'number',
+            inputLabel: 'Amount of credits to add',
+            inputPlaceholder: 'e.g. 50',
+            showCancelButton: true
         });
-        
-        if (error) {
-            Swal.fire('Error', error.message, 'error');
-        } else {
-            Swal.fire('Success', 'Credits added successfully', 'success');
-            loadAllUsers();
+
+        if (credits) {
+            const { error } = await supabase.rpc('add_credits', {
+                user_id: userId,
+                credit_amount: parseInt(credits)
+            });
+            
+            if (error) {
+                Swal.fire('Error', error.message, 'error');
+            } else {
+                Swal.fire('Success', 'Credits added successfully', 'success');
+                loadAllUsers();
+            }
         }
+    } else {
+         const credits = prompt("Enter credits to add:");
+         if(credits) {
+             const { error } = await supabase.rpc('add_credits', {
+                user_id: userId,
+                credit_amount: parseInt(credits)
+            });
+            if (error) alert(error.message);
+            else { alert('Credits added'); loadAllUsers(); }
+         }
     }
 };
-
-// Expose functions globally for HTML access
-// window.addCredits = addCredits; // This line seems to be a leftover from a previous edit or a misunderstanding. 'addCredits' is not defined.
-
-// --- Certificate Generation Logic ---
-document.addEventListener('DOMContentLoaded', () => {
-    const certForm = document.getElementById('adminCertForm');
-    if (certForm) {
-        certForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = e.target.querySelector('button[type="submit"]');
-            const originalText = btn.textContent;
-            btn.disabled = true;
-            btn.textContent = 'Generating PDF...';
-
-            try {
-                // 1. Capture Data
-                const name = document.getElementById('genName').value;
-                const pin = document.getElementById('genPIN').value;
-                const date = document.getElementById('genDate').value;
-
-                // 2. Populate Template
-                document.getElementById('cert-name').textContent = name;
-                document.getElementById('cert-pin').textContent = pin;
-                document.getElementById('cert-date').textContent = date;
-
-                // 3. Prepare Element
-                const element = document.getElementById('certificate-template');
-                
-                // Clone to ensure we don't mess up the hidden authentic template or dealing with display:none issues
-                // html2pdf can render elements that are off-screen but visible (like our left: -9999px setup)
-                // However, cloning is safer for repeated use.
-                
-                // 4. Generate PDF
-                const opt = {
-                    margin: 10,
-                    filename: `KRA_Certificate_${pin}.pdf`,
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2, useCORS: true },
-                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-                };
-
-                await html2pdf().set(opt).from(element).save();
-
-                // 5. Success Feedback
-                // Only if Swal is loaded, otherwise alert
-                if (typeof Swal !== 'undefined') {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Certificate Generated',
-                        text: `PDF for ${pin} has been downloaded.`,
-                        timer: 2000,
-                        showConfirmButton: false
-                    });
-                } else {
-                    alert('Certificate Generated Successfully!');
-                }
-
-            } catch (err) {
-                console.error('Generation Error:', err);
-                alert('Failed to generate certificate: ' + err.message);
-            } finally {
-                btn.disabled = false;
-                btn.textContent = originalText;
-            }
-        });
-    }
-});
-
-// Start logic
-document.addEventListener('DOMContentLoaded', () => {
-    if (supabase) {
-        checkAdminAuth();
-    } else {
-        console.error("Supabase not initialized, bypassing auth check (unsafe for prod, debugging only)");
-         // In prod, redirect: window.location.href = '../index.html';
-    }
-});
