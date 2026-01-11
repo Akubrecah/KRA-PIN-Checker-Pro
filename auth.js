@@ -25,29 +25,38 @@ function checkAuthOnLoad() {
     const user = JSON.parse(localStorage.getItem('currentUser'));
     if (user) {
         currentUser = user;
-        updateUI(); // Call the existing updateUI function
+        updateUI(); 
     }
-    // NOTE: Removed forced login popup - users browse freely, login via button clicks
 }
 
-// Explicitly expose openAuth to handle the 'force' parameter
+// Global Auth Functions
 window.openAuth = function(force = false) {
-    // Prefer the new styled auth modal from shared-components
-    const newModal = document.getElementById('authModal');
-    if (newModal && newModal.classList.contains('auth-modal')) {
-        newModal.classList.add('active');
-        document.body.style.overflow = 'hidden';
+    const modal = document.getElementById('authModal');
+    if (!modal) {
+        console.warn('Auth modal not found in DOM.');
         return;
     }
     
-    // Fallback to old modal if new one not available
-    const modal = document.getElementById('authModal');
-    if (!modal) return;
-    
+    if (currentUser && !force) {
+        // Logout confirm
+        Swal.fire({
+            title: 'Logout?',
+            text: "You will be signed out.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Logout'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                logout();
+            }
+        });
+        return;
+    }
+
     if (force) {
         modal.classList.add('modal-unclosable');
-        document.body.classList.add('auth-active-blur'); // Apply blur
-        // Override close behaviors
+        document.body.classList.add('auth-active-blur');
+        
         window.onclick = function(event) {
             if (event.target == modal && modal.classList.contains('modal-unclosable')) {
                 return;
@@ -61,8 +70,8 @@ window.openAuth = function(force = false) {
         }
     } else {
         modal.classList.remove('modal-unclosable');
-        document.body.classList.remove('auth-active-blur'); // Remove blur
-         // Restore standard window click behavior
+        document.body.classList.remove('auth-active-blur');
+        
         window.onclick = function(event) {
             if (event.target == modal) {
                 closeAuth();
@@ -76,21 +85,64 @@ window.openAuth = function(force = false) {
         }
     }
     modal.style.display = 'block';
+    
     // Hide 'Cancel' button if forced
     const cancelBtn = modal.querySelector('.btn-secondary'); 
     if(cancelBtn) {
         cancelBtn.style.display = force ? 'none' : 'block';
     }
-}
-
-// Override closeAuth to respect forcing
-window.closeAuth = function() {
-    const modal = document.getElementById('authModal');
-    if (!modal.classList.contains('modal-unclosable')) {
-        modal.style.display = 'none';
-        document.body.classList.remove('auth-active-blur');
+    
+    // Make modal active for new style
+    if (modal.classList.contains('auth-modal')) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
     }
 }
+
+window.closeAuth = function() {
+    const modal = document.getElementById('authModal');
+    if (modal) {
+        if (!modal.classList.contains('modal-unclosable')) {
+            modal.style.display = 'none';
+            modal.classList.remove('active');
+            document.body.classList.remove('auth-active-blur');
+            document.body.style.overflow = '';
+        }
+    }
+}
+
+function openPricing() {
+    const pricingModal = document.getElementById('pricingModal');
+    if (pricingModal) pricingModal.style.display = 'block';
+}
+
+function switchAuthMode(mode) {
+    const title = document.getElementById('authTitle');
+    const roleGroup = document.getElementById('roleSelectGroup');
+    const submitBtn = document.getElementById('authSubmitBtn');
+    const tabLogin = document.getElementById('tabLogin');
+    const tabRegister = document.getElementById('tabRegister');
+    const authForm = document.getElementById('authForm');
+
+    if (title && roleGroup && submitBtn && tabLogin && tabRegister && authForm) {
+        if (mode === 'register') {
+            title.textContent = 'Create Account';
+            roleGroup.style.display = 'block';
+            submitBtn.textContent = 'Register & Start';
+            tabLogin.classList.remove('active');
+            tabRegister.classList.add('active');
+            authForm.dataset.mode = 'register';
+        } else {
+            title.textContent = 'Welcome Back';
+            roleGroup.style.display = 'none';
+            submitBtn.textContent = 'Login';
+            tabLogin.classList.add('active');
+            tabRegister.classList.remove('active');
+            authForm.dataset.mode = 'login';
+        }
+    }
+}
+window.switchAuthMode = switchAuthMode;
 
 
 // Initialize on Page Load
@@ -99,31 +151,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (window.location.hash && window.location.hash.includes('access_token')) {
         console.log('[Auth] OAuth redirect detected, parsing token from URL hash...');
         
-        // IMMEDIATELY clean the hash to prevent loops
         const cleanPath = window.location.pathname + window.location.search;
         history.replaceState(null, '', cleanPath);
         
-        // Give Supabase a moment to process the hash (it does this automatically)
         await new Promise(resolve => setTimeout(resolve, 500));
         
         try {
-            // Get the session that Supabase extracts from the hash
             const sessionResult = await window.SupabaseClient.auth.getSession();
-            console.log('[Auth] Session result:', sessionResult);
-            
-            // Session is nested: sessionResult.session.user
             const session = sessionResult?.session || sessionResult;
             const user = session?.user;
             
             if (user) {
                 console.log('[Auth] User authenticated:', user.email);
-                
-                // Try to fetch profile, create basic user if not found
                 try {
                     const profile = await window.SupabaseClient.profile.get(user.id);
                     currentUser = { ...user, ...profile, loggedIn: true };
                 } catch (e) {
-                    // Profile may not exist for new OAuth users - create minimal user
                     console.log('[Auth] No profile found, using basic user data');
                     currentUser = { 
                         ...user, 
@@ -132,12 +175,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                         role: 'personal'
                     };
                 }
-                
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
                 updateUI();
-                
-                console.log('[Auth] OAuth login complete!');
-                return; // Skip normal auth check
+                return;
             }
         } catch (err) {
             console.error('[Auth] Error processing OAuth hash:', err);
@@ -146,19 +186,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     checkAuthOnLoad();
     
-    // Listen for Auth Changes (e.g. OAuth Redirects)
     if (window.SupabaseClient && window.SupabaseClient.auth.onAuthStateChange) {
         window.SupabaseClient.auth.onAuthStateChange(async (event, session) => {
-            console.log("Auth State Change:", event);
             if (event === 'SIGNED_IN' && session) {
-                // Only act if we don't have current user or it's a fresh login
-                // Fetch full profile to ensure we have credits/role
                 try {
                      const profile = await window.SupabaseClient.profile.get(session.user.id);
                      currentUser = { ...session.user, ...profile };
                      localStorage.setItem('currentUser', JSON.stringify(currentUser));
                      updateUI();
-                     closeAuth(); // Close modal if open
+                     window.closeAuth();
                 } catch (err) {
                     console.error("Error fetching profile on auth change:", err);
                 }
@@ -173,20 +209,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Check for cert generation gating
     const generateBtn = document.getElementById('generateCertBtn');
     if (generateBtn) {
-        console.log("Attaching listener to #generateCertBtn");
         generateBtn.addEventListener('click', (e) => {
-             console.log("#generateCertBtn clicked, checking auth...");
-             // Logic: Must be logged in
              if (!currentUser) {
-                 console.log("No user logged in, forcing auth modal.");
                  e.preventDefault();
                  e.stopPropagation();
-                 openAuth(true);
+                 window.openAuth(true);
                  return;
              }
-             
-             // Gating Logic Relaxed: Allow ALL logged-in users 
-             console.log("Auth check passed, dispatching certGenerationApproved.");
              window.dispatchEvent(new CustomEvent('certGenerationApproved'));
         });
     }
@@ -204,79 +233,15 @@ try {
     console.error('Supabase init failed:', e);
 }
 
-// UI Elements
-const authModal = document.getElementById('authModal');
-const paymentModal = document.getElementById('paymentModal'); // Will add this
-const pricingModal = document.getElementById('pricingModal');
-const userBadge = document.getElementById('userBadge');
-const authBtn = document.getElementById('authBtn');
-
-// --- Auth Functions --- //
-
-function openAuth() {
-    if (currentUser) {
-        // Logout confirm
-        Swal.fire({
-            title: 'Logout?',
-            text: "You will be signed out.",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, Logout'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                logout();
-            }
-        });
-    } else {
-        authModal.style.display = 'block';
-    }
-}
-
-function closeAuth() {
-    authModal.style.display = 'none';
-}
-
-function openPricing() {
-    pricingModal.style.display = 'block';
-}
-
-function switchAuthMode(mode) {
-    const title = document.getElementById('authTitle');
-    const roleGroup = document.getElementById('roleSelectGroup');
-    const submitBtn = document.getElementById('authSubmitBtn');
-    const tabLogin = document.getElementById('tabLogin');
-    const tabRegister = document.getElementById('tabRegister');
-    const authForm = document.getElementById('authForm');
-
-    if (mode === 'register') {
-        title.textContent = 'Create Account';
-        roleGroup.style.display = 'block';
-        submitBtn.textContent = 'Register & Start';
-        tabLogin.classList.remove('active');
-        tabRegister.classList.add('active');
-        authForm.dataset.mode = 'register';
-    } else {
-        title.textContent = 'Welcome Back';
-        roleGroup.style.display = 'none';
-        submitBtn.textContent = 'Login';
-        tabLogin.classList.add('active');
-        tabRegister.classList.remove('active');
-        authForm.dataset.mode = 'login';
-    }
-}
-
-// Expose to global scope for HTML onclick attributes
-window.switchAuthMode = switchAuthMode;
-
 async function handleAuth(e) {
     e.preventDefault();
     const email = document.getElementById('authEmail').value;
-    const password = document.getElementById('authPassword').value; // Need to ensure this input exists
-    const mode = document.getElementById('authForm').dataset.mode;
+    const password = document.getElementById('authPassword').value;
+    const authForm = document.getElementById('authForm');
+    const mode = authForm.dataset.mode;
     const role = document.getElementById('authRole').value;
     const submitBtn = document.getElementById('authSubmitBtn');
     
-    // Set loading state
     const originalText = submitBtn.textContent;
     submitBtn.textContent = 'Processing...';
     submitBtn.disabled = true;
@@ -285,38 +250,24 @@ async function handleAuth(e) {
         let authResult;
         
         if (mode === 'register') {
-            // 1. Sign Up
             authResult = await window.SupabaseClient.auth.signUp(email, password, { 
                 role: role,
-                full_name: email.split('@')[0] // Default name
+                full_name: email.split('@')[0]
             });
-            
             if (authResult.error) throw authResult.error;
-            
             Swal.fire({
                 icon: 'success',
                 title: 'Registration Successful',
                 text: 'Please check your email to confirm your account.',
             });
-            
         } else {
-            // 2. Sign In
             authResult = await window.SupabaseClient.auth.signIn(email, password);
              if (authResult.error) throw authResult.error;
-             
-             // Fetch Profile Data (credits, role, etc)
              const profile = await window.SupabaseClient.profile.get(authResult.user.id);
-             
-             currentUser = {
-                 ...authResult.user,
-                 ...profile // Merge profile data (role, credits, etc)
-             };
-             
-             // Persist to localStorage for checkAuthOnLoad
+             currentUser = { ...authResult.user, ...profile };
              localStorage.setItem('currentUser', JSON.stringify(currentUser));
-             
              updateUI();
-             closeAuth();
+             window.closeAuth();
              
              Swal.fire({
                 icon: 'success',
@@ -349,14 +300,9 @@ window.googleLogin = async function() {
            btn.disabled = true;
         }
 
-        // Use the wrapper we added to supabase-client.js
         const { data, error } = await window.SupabaseClient.auth.signInWithOAuth('google');
-        
         if (error) throw error;
         
-        // Note: OAuth redirect happens here, so code below might not run immediately.
-        // But if it's a pop-up or handling redirect result:
-        // Supabase usually redirects. On return (checkAuthOnLoad), we need to handle session restoration.
     } catch (error) {
         console.error('Google Sign-In error:', error);
         Swal.fire({
@@ -365,7 +311,6 @@ window.googleLogin = async function() {
             text: 'Ensure Google OAuth is configured in Supabase Dashboard -> Authentication -> Providers.',
             footer: '<a href="https://supabase.com/docs/guides/auth/social-login/auth-google" target="_blank">View Configuration Guide</a>'
         });
-        
         const btn = document.querySelector('.btn-google');
         if (btn) {
             btn.disabled = false;
@@ -382,24 +327,26 @@ function logout() {
 
 function updateUI() {
     const toolSection = document.getElementById('tool');
-    const heroSection = document.querySelector('.hero-section');
+    const userBadge = document.getElementById('userBadge');
+    const authBtn = document.getElementById('authBtn');
     
+    // Check if elements exist before using them
+    if (!authBtn) return; // Basic requirement
+    if (!userBadge && currentUser) return;
+
     if (currentUser) {
-        userBadge.textContent = currentUser.role.toUpperCase();
-        userBadge.classList.remove('hidden');
+        if (userBadge) {
+            userBadge.textContent = currentUser.role ? currentUser.role.toUpperCase() : 'USER';
+            userBadge.classList.remove('hidden');
+        }
         authBtn.textContent = 'Logout';
         if (toolSection) toolSection.style.display = 'block';
-        // Optional: Hide hero or adjust it? keeping it for now.
     } else {
-        userBadge.classList.add('hidden');
+        if (userBadge) userBadge.classList.add('hidden');
         authBtn.textContent = 'Login / Register';
         if (toolSection) toolSection.style.display = 'none';
     }
 }
-
-// --- Payment & Gating Logic --- //
-
-// --- Payment & Gating Logic --- //
 
 window.checkAccess = async function() {
     if (!currentUser) {
@@ -409,24 +356,22 @@ window.checkAccess = async function() {
             text: 'Please login or register to use the PIN Checker.',
             confirmButtonText: 'Login Now'
         }).then((res) => {
-            if(res.isConfirmed) openAuth();
+            if(res.isConfirmed) window.openAuth();
         });
         return false;
     }
 
-    // Refresh user data to get latest credits/subscription
     try {
         const freshUser = await window.SupabaseClient.credits.get(currentUser.id);
         if (freshUser) {
             currentUser.credits = freshUser.credits;
             currentUser.subscription_status = freshUser.subscription_status;
-            updateUI(); // Reflect changes in badge etc
+            updateUI();
         }
     } catch (e) {
         console.warn("Failed to refresh user credits:", e);
     }
 
-    // Cyber Subscription Check
     if (currentUser.role === 'cyber') {
         if (currentUser.subscription_status === 'active') {
             return true;
@@ -436,12 +381,10 @@ window.checkAccess = async function() {
         }
     }
 
-    // Personal Credit Check
     if (currentUser.role === 'personal') {
         if (currentUser.credits > 0) {
             return true;
         } else {
-            // Show Pay-per-use Prompt
             Swal.fire({
                 title: 'Insufficient Credits',
                 text: "You need 1 credit to perform this check. Cost: 100 KES.",
@@ -457,21 +400,21 @@ window.checkAccess = async function() {
             return false;
         }
     }
-    
     return false;
 };
 
 function startPayment(plan) {
     if (!currentUser) {
-        openAuth();
+        window.openAuth();
         return;
     }
 
-    pricingModal.style.display = 'none';
+    const pricingModal = document.getElementById('pricingModal');
+    if (pricingModal) pricingModal.style.display = 'none';
+    
     let amount = plan === 'personal' ? 100 : (plan === 'cyber_monthly' ? 2500 : 800);
     let type = plan === 'personal' ? 'credit_purchase' : 'subscription';
     
-    // Prompt for Phone Number
     Swal.fire({
         title: 'M-PESA Payment',
         text: `Enter your M-PESA phone number to pay ${amount} KES`,
@@ -506,7 +449,6 @@ function startPayment(plan) {
     }).then((result) => {
         if (result.isConfirmed && result.value && result.value.success) {
             const checkoutReqID = result.value.checkoutRequestID;
-            
             Swal.fire({
                 title: 'Payment Initiated',
                 text: 'Check your phone for the M-PESA prompt. Waiting for confirmation...',
@@ -524,7 +466,7 @@ function startPayment(plan) {
 
 function pollPaymentStatus(checkoutRequestID) {
     let attempts = 0;
-    const maxAttempts = 60; // 2 minutes (assuming 2s interval)
+    const maxAttempts = 60;
     
     const interval = setInterval(async () => {
         attempts++;
@@ -534,15 +476,12 @@ function pollPaymentStatus(checkoutRequestID) {
             
             if (data.status === 'completed') {
                 clearInterval(interval);
-                
-                // Refresh User Data
                 const freshUser = await window.SupabaseClient.credits.get(currentUser.id);
                 if (freshUser) {
                     currentUser.credits = freshUser.credits;
                     currentUser.subscription_status = freshUser.subscription_status;
                     updateUI();
                 }
-
                 Swal.fire({
                     icon: 'success',
                     title: 'Payment Successful!',
@@ -564,21 +503,18 @@ function pollPaymentStatus(checkoutRequestID) {
     }, 3000);
 }
 
-// Deprecated Mock Process Function removed
+// Event Listeners with Safe Guards
+const authForm = document.getElementById('authForm');
+if (authForm) {
+    authForm.addEventListener('submit', handleAuth);
+}
 
-// Event Listeners
-document.getElementById('authForm').addEventListener('submit', handleAuth);
-
-// Hijack the "Start Verification" button in Hero
-// We need to attach this safely
 document.addEventListener('DOMContentLoaded', () => {
-    // Override the verify buttons to check access first
     // Override the verify buttons to check access first
     const submitBtnID = document.getElementById('submitBtnID');
     if (submitBtnID) {
         const originalIDClick = submitBtnID.onclick;
         
-        // We intercept form submission instead
         const checkerFormID = document.getElementById('checkerFormID');
         if (checkerFormID) {
             checkerFormID.addEventListener('submit', (e) => {
@@ -586,10 +522,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     e.stopImmediatePropagation();
                     e.preventDefault();
                 } else {
-                    // Deduct credit if personal
                     if (currentUser && currentUser.role === 'personal') currentUser.credits--; 
                 }
-            }, true); // Capture phase
+            }, true);
         }
     }
     
@@ -605,9 +540,4 @@ document.addEventListener('DOMContentLoaded', () => {
         }, true);
     }
 });
-
-// Expose Auth Functions Globally
-window.openAuth = openAuth;
-window.closeAuth = closeAuth;
-window.switchAuthMode = switchAuthMode;
 
