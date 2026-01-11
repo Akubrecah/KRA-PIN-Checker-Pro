@@ -795,9 +795,21 @@
     <script type="module" src="kra_api.js"></script>
     <script type="module" src="auth.js"></script>
     <script type="module" src="shared-components.js"></script>
-    <script>
+    <script type="module">
         // Inject the new styled auth modal
-        document.body.appendChild(createAuthModal());
+        // Wait for window load or ensure shared-components is ready
+        if (window.createAuthModal) {
+             document.body.appendChild(createAuthModal());
+        } else {
+            // Poll for it (since modules are async)
+            const check = setInterval(() => {
+                if (window.createAuthModal) {
+                    clearInterval(check);
+                    document.body.appendChild(createAuthModal());
+                }
+            }, 50);
+        }
+        
         if (window.lucide) lucide.createIcons();
     </script>
     <script>
