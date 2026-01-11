@@ -147,6 +147,11 @@ function initPage(activePage) {
     if (existingFooter) existingFooter.remove();
     document.body.appendChild(createFooter());
     
+    // CRITICAL: Add auth modal if not already present
+    if (!document.getElementById('authModal')) {
+        document.body.appendChild(createAuthModal());
+    }
+    
     // Initialize icons
     if (window.lucide) lucide.createIcons();
 }
