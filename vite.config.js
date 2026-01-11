@@ -8,8 +8,6 @@ module.exports = defineConfig({
       input: {
         main: resolve(__dirname, 'index.html'),
         dashboard: resolve(__dirname, 'dashboard.html'),
-        login: resolve(__dirname, 'login.html'),
-        signup: resolve(__dirname, 'signup.html'),
         onboarding: resolve(__dirname, 'onboarding.html'),
         about: resolve(__dirname, 'about.html'),
         pricing: resolve(__dirname, 'pricing.html'),

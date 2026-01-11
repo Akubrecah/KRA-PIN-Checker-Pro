@@ -34,9 +34,9 @@ function createHeader(activePage = 'home') {
             <div style="display: flex; gap: 12px; align-items: center;">
                 ${isLoggedIn 
                     ? `<a href="dashboard.html" class="nav-link">${userName}</a>`
-                    : `<a href="login.html" class="nav-link">Login</a>`
+                    : `<a href="javascript:void(0)" class="nav-link" onclick="openAuth()">Login</a>`
                 }
-                <button class="btn-primary" onclick="handleGetStarted()">Get Started</button>
+                <button class="btn-primary" onclick="openAuth()">Get Started</button>
             </div>
         </nav>
     `;
