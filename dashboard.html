@@ -107,6 +107,13 @@
             margin-bottom: 2rem;
         }
         
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
         .stat-card {
             background: white;
             border-radius: 16px;
@@ -142,6 +149,33 @@
             grid-template-columns: 1.2fr 0.8fr;
             gap: 2rem;
         }
+
+        .input-icon-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon-wrapper i {
+            position: absolute;
+            left: 1rem;
+            color: var(--color-icon);
+            width: 18px;
+            height: 18px;
+        }
+
+        .input-icon-wrapper input {
+            padding-left: 2.8rem;
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.8rem;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        
+    </style>
         
         .main-card {
             background: white;
@@ -589,10 +623,58 @@
         </section>
     </main>
 
+    <!-- Profile Management Modal -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content auth-content">
+            <div class="auth-header">
+                <h2>Profile Settings</h2>
+                <span class="close-modal" onclick="closeProfile()">&times;</span>
+            </div>
+            
+            <form id="profileForm" class="auth-form" onsubmit="handleProfileUpdate(event)">
+                <div class="profile-avatar-upload" style="margin: 0 auto 2rem; width: 80px; height: 80px; position: relative; cursor: pointer;">
+                    <div id="profileAvatarPreview" class="user-avatar" style="width: 100%; height: 100%; font-size: 2rem;">A</div>
+                    <div style="position: absolute; bottom: 0; right: 0; background: var(--color-primary); color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border: 2px solid white;">
+                        <i data-lucide="camera" style="width: 14px;"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <div class="input-icon-wrapper">
+                        <i data-lucide="user"></i>
+                        <input type="text" id="profileName" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <div class="input-icon-wrapper">
+                        <i data-lucide="mail"></i>
+                        <input type="email" id="profileEmail" disabled style="background: var(--color-background); opacity: 0.7;">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>New Password (Optional)</label>
+                    <div class="input-icon-wrapper">
+                        <i data-lucide="lock"></i>
+                        <input type="password" id="profilePassword" placeholder="Leave blank to keep current">
+                    </div>
+                </div>
+
+                <button type="submit" id="profileSubmitBtn" class="btn-primary full-width">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
     <script type="module" src="supabase-client.js"></script>
     <script type="module" src="kra_api.js"></script>
+    <script type="module" src="auth.js"></script>
     <script>
         lucide.createIcons();
+        
+        // Import helpful functions from auth.js if exposed, or define local handlers
         
         // Auth check is handled by auth-guard.js at the top of the page
         // We do not strictly check here to allow async auth.js to process OAuth hashes
