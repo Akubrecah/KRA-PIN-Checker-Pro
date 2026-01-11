@@ -224,16 +224,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // Initialize Supabase if keys exist (mock for now if invalid)
-let supabase;
-try {
-    if (SUPABASE_URL.includes('PLACEHOLDER')) {
-        console.warn('Supabase Keys missing. Auth flows will simulate success.');
-    } else {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    }
-} catch (e) {
-    console.error('Supabase init failed:', e);
-}
+// Initialize Supabase if keys exist (mock for now if invalid)
+// NOTE: auth.js relies on window.SupabaseClient defined in supabase-client.js
+// We do not need to initialize a separate client here.
+// let supabase; 
+// Removed to prevent "Invalid API key" errors from placeholders
 
 async function handleAuth(e) {
     e.preventDefault();
