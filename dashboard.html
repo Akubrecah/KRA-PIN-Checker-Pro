@@ -9,12 +9,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         /* Prevent FOUC (Flash of Unauthenticated Content) */
         body { display: none; }
     </style>
-    <script src="auth-guard.js"></script>
+    <!-- Guest Mode Enabled: Auth Guard Removed -->
+    <!-- <script src="auth-guard.js"></script> -->
     <script type="module" src="supabase-client.js"></script>
     <script type="module" src="auth.js"></script>
     <link rel="stylesheet" href="dashboard.css">
@@ -324,6 +325,25 @@
     <script type="module" src="kra_api.js"></script>
     <script type="module" src="auth.js"></script>
     <script>
+        // --- GUEST USER INIT ---
+        (function() {
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            if (!user) {
+                const guestUser = {
+                    id: 'guest-' + Date.now(),
+                    email: 'guest@demo.com',
+                    name: 'Guest User',
+                    role: 'cyber', // Using cyber role for max privileges
+                    credits: 9999,
+                    loggedIn: true,
+                    subscription_status: 'active'
+                };
+                localStorage.setItem('currentUser', JSON.stringify(guestUser));
+                console.log('Guest user initialized');
+            }
+        })();
+        // -----------------------
+
         lucide.createIcons();
         
         // Import helpful functions from auth.js if exposed, or define local handlers
