@@ -475,6 +475,12 @@
         }
         
         function generateCertificate() {
+            // Retrieve currentUser from localStorage to avoid ReferenceError if global var is missing
+            let currentUser = null;
+            try {
+                currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            } catch (e) { console.error("Error reading user", e); }
+
             const data = {
                 pin: document.getElementById('kraPin').value,
                 name: document.getElementById('taxpayerName').value,
@@ -502,6 +508,7 @@
             }
 
             // 1. Credit Check (Enforce Limits)
+            // Guest "cyber" role has high credits, so this usually passes unless explicitly 0
             if (currentUser && currentUser.role !== 'admin') {
                 if (currentUser.credits <= 0) {
                      Swal.fire({
@@ -512,7 +519,6 @@
                         showCancelButton: true
                     }).then((result) => {
                         if (result.isConfirmed) {
-                             // Correct ID for pricing modal
                              const pricingModal = document.getElementById('pricingModal');
                              if(pricingModal) pricingModal.classList.remove('hidden');
                         }
