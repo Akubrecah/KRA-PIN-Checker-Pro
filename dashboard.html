@@ -507,6 +507,13 @@
                 return;
             }
 
+            // Check if html2pdf is loaded
+            if (typeof html2pdf === 'undefined') {
+                showStatus('Error: PDF generation library not loaded. Please refresh the page.', true);
+                console.error('html2pdf is undefined');
+                return;
+            }
+
             // 1. Credit Check (Enforce Limits)
             // Guest "cyber" role has high credits, so this usually passes unless explicitly 0
             if (currentUser && currentUser.role !== 'admin') {
@@ -527,6 +534,7 @@
                 }
             }
             
+            showStatus('Generating certificate... Please wait.', false, true);
             const today = new Date().toLocaleDateString('en-GB');
             
             // Original KRA Certificate Design - A4 Single Page
@@ -681,7 +689,7 @@
                 <div class="kra-cert-container">
                     <div class="kra-cert-header">
                         <div class="kra-logo-section">
-                            <img src="image1.jpeg" alt="KRA Logo">
+                            <img src="image1.jpeg" alt="KRA Logo" onerror="this.onerror=null;this.src='logo.png';">
                         </div>
                         <div class="kra-cert-label">PIN Certificate</div>
                         <div class="kra-contact-info">
@@ -780,41 +788,61 @@
             
             const filename = data.pin ? `KRA_PIN_Certificate_${data.pin}.pdf` : `KRA_PIN_Certificate_${data.name.replace(/\s+/g, '_')}.pdf`;
             
-            const opt = {
-                margin: 0,
-                filename: filename,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true, logging: false, allowTaint: true, scrollY: 0 },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: 'avoid-all' }
-            };
-            html2pdf().set(opt).from(element.querySelector('.kra-cert-container')).save().then(async () => {
-                document.body.removeChild(element);
-                
-                // 2. Deduct Credit & Log Usage (Backend)
-                if (currentUser) {
-                    try {
-                        if (currentUser.role !== 'admin') {
-                            await window.SupabaseClient.credits.deduct(currentUser.id);
-                            currentUser.credits = Math.max(0, currentUser.credits - 1);
-                            document.getElementById('creditsLeft').textContent = currentUser.credits;
-                            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                        }
-                        
-                        // Log the certificate generation
-                        await window.SupabaseClient.usage.logCertificate(currentUser.id, data.pin);
-
-                    } catch (error) {
-                        console.error("Usage logging failed:", error);
-                    }
-                }
+            // Wait for images to load before generating PDF
+            const images = element.querySelectorAll('img');
+            const imagePromises = Array.from(images).map(img => {
+                if (img.complete) return Promise.resolve();
+                return new Promise(resolve => {
+                    img.onload = resolve;
+                    img.onerror = resolve; // Continue even if image fails
+                });
             });
-            
-            stats.certificates++;
-            localStorage.setItem('userStats', JSON.stringify(stats));
-            document.getElementById('certCount').textContent = stats.certificates;
-            showStatus('Official KRA Certificate generated and downloaded!');
+
+            Promise.all(imagePromises).then(() => {
+                const opt = {
+                    margin: 0,
+                    filename: filename,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true, logging: false, allowTaint: true, scrollY: 0 },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                    pagebreak: { mode: 'avoid-all' }
+                };
+
+                html2pdf().set(opt).from(element.querySelector('.kra-cert-container')).save()
+                .then(async () => {
+                    document.body.removeChild(element);
+                    
+                    // 2. Deduct Credit & Log Usage (Backend)
+                    if (currentUser) {
+                        try {
+                            if (currentUser.role !== 'admin') {
+                                await window.SupabaseClient.credits.deduct(currentUser.id);
+                                currentUser.credits = Math.max(0, currentUser.credits - 1);
+                                document.getElementById('creditsLeft').textContent = currentUser.credits;
+                                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                            }
+                            
+                            // Log the certificate generation
+                            await window.SupabaseClient.usage.logCertificate(currentUser.id, data.pin);
+    
+                        } catch (error) {
+                            console.error("Usage logging failed:", error);
+                        }
+                    }
+                    
+                    stats.certificates++;
+                    localStorage.setItem('userStats', JSON.stringify(stats));
+                    document.getElementById('certCount').textContent = stats.certificates;
+                    showStatus('Official KRA Certificate generated and downloaded!');
+                })
+                .catch(err => {
+                    console.error('PDF Generation Error:', err);
+                    document.body.removeChild(element);
+                    showStatus('Failed to generate PDF. Please try again.', true);
+                });
+            });
         }
+
         
         // --- Profile Modal Functions ---
         function openProfileModal() {
